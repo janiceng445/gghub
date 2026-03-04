@@ -3,6 +3,8 @@
 // ══════════════════════════════════════════════
 
 function showPage(name) {
+  window.scrollTo(0, 0);
+  
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(name + '-page').classList.add('active');
@@ -14,11 +16,6 @@ function showPage(name) {
   
   if (name === 'recipe') renderRecipes();
   if (name === 'gas') { renderSavedCar(); loadSavedCar(); }
-  
-  // Scroll to top when navigating to a new page
-  setTimeout(() => {
-    window.scrollTo(0, 0);
-  }, 0);
 }
 
 function toggleSidebar() {
