@@ -1,0 +1,59 @@
+/* ── Tip Result ── */
+.tip-result {
+  background: linear-gradient(135deg, rgba(224,32,32,0.10), rgba(224,32,32,0.03));
+  border: 1px solid rgba(224,32,32,0.2);
+  border-radius: var(--radius);
+  padding: 22px;
+  margin-top: 20px;
+  display: none;
+}
+.tip-result.visible { display: block; }
+.tip-result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 0; }
+.tip-stat { text-align: center; }
+.tip-stat-val { font-family: 'Outfit', sans-serif; font-size: 1.45rem; font-weight: 800; color: var(--accent); }
+.tip-stat-lbl { font-size: 0.72rem; color: var(--text2); margin-top: 4px; letter-spacing: 0.02em; }
+
+/* Round up / down boxes */
+.round-divider { border: none; border-top: 1px solid rgba(224,32,32,0.15); margin: 18px 0; }
+.round-label { font-size: 0.72rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 12px; }
+.round-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.round-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.round-box-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.round-box-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); white-space: nowrap; }
+.round-box-badge { font-size: 0.76rem; font-weight: 700; padding: 3px 9px; border-radius: 100px; align-self: flex-start; }
+.badge-up { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+.badge-down { background: rgba(255,68,68,0.12); color: var(--danger); border: 1px solid rgba(255,68,68,0.2); }
+.round-total { font-family: 'Outfit', sans-serif; font-size: 1.55rem; font-weight: 800; color: var(--text); }
+.round-per { font-size: 0.88rem; color: var(--text2); margin-top: 2px; }
+.round-meta { display: flex; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.round-meta-item { font-size: 0.84rem; color: var(--text2); }
+.round-meta-item span { color: var(--text); font-weight: 600; }
+
+/* Percentage pills */
+.pct-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.pct-pill {
+  padding: 7px 16px; border-radius: 100px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 0.84rem; font-weight: 600; cursor: pointer; transition: all 0.18s; color: var(--text2);
+  font-family: 'Inter', sans-serif;
+}
+.pct-pill:hover, .pct-pill.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .tip-result { padding: 14px 12px; }
+  .tip-result-grid { gap: 8px; }
+  .tip-stat-val { font-size: 1.15rem; }
+  .round-grid { gap: 8px; }
+  .round-box { padding: 12px 14px; }
+  .round-box-title { font-size: 0.8rem; }
+  .round-box-badge { font-size: 0.76rem; padding: 3px 9px; }
+  .round-total { font-size: 1.45rem; }
+  .round-meta { gap: 8px; margin-top: 8px; padding-top: 8px; }
+  .round-meta-item { font-size: 0.84rem; }
+}

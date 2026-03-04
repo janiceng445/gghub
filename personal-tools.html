@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --surface3: #222222;
+    --border: #2a2a2a;
+    --accent: #e02020;
+    --accent-hover: #c41818;
+    --accent-glow: rgba(224,32,32,0.25);
+    --accent2: #ff6b35;
+    --accent3: #ff4444;
+    --text: #f0f0f0;
+    --text2: #888888;
+    --text3: #555555;
+    --danger: #ff4444;
+    --success: #4ade80;
+    --nav-h: 64px;
+    --radius: 14px;
+    --radius-sm: 9px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    overflow-x: hidden;
+  }
+
+  /* ── Layout ── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* ── Top Nav (desktop) ── */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(14,14,17,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 28px;
+    height: var(--nav-h);
+  }
+
+  .top-nav .logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-right: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .nav-btn {
+    background: none;
+    border: none;
+    color: var(--text2);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .nav-btn svg { opacity: 0.7; }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active { background: var(--surface2); color: var(--text); }
+  .nav-btn.active svg { opacity: 1; color: var(--accent); }
+  .nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 3px; height: 3px; border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── Hamburger button (mobile only) ── */
+  .hamburger {
+    display: none;
+    position: fixed; top: 14px; right: 16px; z-index: 300;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); width: 40px; height: 40px;
+    cursor: pointer; align-items: center; justify-content: center;
+    flex-direction: column; gap: 5px; transition: all 0.2s;
+  }
+  .hamburger:hover { background: var(--surface3); }
+  .hamburger span {
+    display: block; width: 18px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: all 0.25s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ── Sidebar ── */
+  .sidebar-overlay {
+    display: none; position: fixed; inset: 0; z-index: 250;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+  }
+  .sidebar-overlay.open { display: block; }
+  .sidebar {
+    position: fixed; top: 0; right: -260px; bottom: 0; z-index: 260;
+    width: 240px; background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 60px 16px 24px;
+    transition: right 0.28s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .sidebar.open { right: 0; }
+  .sidebar-logo {
+    font-family: 'Outfit', sans-serif; font-weight: 800;
+    font-size: 1rem; color: var(--text); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar-btn {
+    background: none; border: none;
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 14px; border-radius: var(--radius-sm);
+    color: var(--text2); font-family: 'Inter', sans-serif;
+    font-size: 0.92rem; font-weight: 500;
+    cursor: pointer; transition: all 0.18s; text-align: left; width: 100%;
+  }
+  .sidebar-btn svg { flex-shrink: 0; }
+  .sidebar-btn:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-btn.active { background: rgba(224,32,32,0.1); color: var(--accent); border: 1px solid rgba(224,32,32,0.2); }
+  .sidebar-btn.active svg { color: var(--accent); }
+
+  /* ── Pages ── */
+  .page { display: none; flex: 1; padding: 32px 28px; max-width: 860px; margin: 0 auto; width: 100%; }
+  .page.active { display: block; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text2);
+    margin-bottom: 20px;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    margin-bottom: 32px;
+  }
+  .page-header h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .page-header p { color: var(--text2); margin-top: 8px; font-size: 0.88rem; }
+  .accent-line {
+    display: inline-block;
+    width: 32px; height: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  /* ── Form Elements ── */
+  label { display: block; font-size: 0.8rem; color: var(--text2); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.01em; }
+
+  input[type=text], input[type=number], input[type=date], select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    padding: 11px 14px;
+    outline: none;
+    transition: border 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  textarea { resize: vertical; min-height: 100px; font-family: 'Inter', sans-serif; }
+
+  /* Input with clear button */
+  .input-wrap { position: relative; }
+  .input-wrap input { padding-right: 36px; }
+  .input-clear {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: var(--surface3); border: none; color: var(--text2);
+    width: 20px; height: 20px; border-radius: 50%;
+    cursor: pointer; display: none; align-items: center; justify-content: center;
+    font-size: 11px; transition: all 0.15s; line-height: 1;
+  }
+  .input-clear:hover { background: var(--accent); color: #fff; }
+  .input-wrap input:not(:placeholder-shown) ~ .input-clear { display: flex; }
+
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .input-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .input-group { margin-bottom: 14px; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    padding: 11px 22px;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.18s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 20px var(--accent-glow); }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--surface3); }
+  .btn-ghost { background: none; color: var(--text2); border: 1px solid var(--border); }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-danger { background: rgba(255,68,68,0.12); color: var(--danger); border: 1px solid rgba(255,68,68,0.25); }
+  .btn-danger:hover { background: rgba(255,68,68,0.22); }
+  .btn-success { background: rgba(74,222,128,0.12); color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+  .btn-sm { padding: 7px 14px; font-size: 0.78rem; border-radius: 7px; }
+  .btn-full { width: 100%; }
+
+  /* ── Tip Result ── */
+  .tip-result {
+    background: linear-gradient(135deg, rgba(224,32,32,0.10), rgba(224,32,32,0.03));
+    border: 1px solid rgba(224,32,32,0.2);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-top: 20px;
+    display: none;
+  }
+  .tip-result.visible { display: block; }
+  .tip-result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 0; }
+  .tip-stat { text-align: center; }
+  .tip-stat-val { font-family: 'Outfit', sans-serif; font-size: 1.45rem; font-weight: 800; color: var(--accent); }
+  .tip-stat-lbl { font-size: 0.72rem; color: var(--text2); margin-top: 4px; letter-spacing: 0.02em; }
+
+  /* Round up / down boxes */
+  .round-divider { border: none; border-top: 1px solid rgba(224,32,32,0.15); margin: 18px 0; }
+  .round-label { font-size: 0.72rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; margin-bottom: 12px; }
+  .round-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .round-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+  }
+  .round-box-header { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .round-box-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); white-space: nowrap; }
+  .round-box-badge { font-size: 0.76rem; font-weight: 700; padding: 3px 9px; border-radius: 100px; align-self: flex-start; }
+  .badge-up { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+  .badge-down { background: rgba(255,68,68,0.12); color: var(--danger); border: 1px solid rgba(255,68,68,0.2); }
+  .round-total { font-family: 'Outfit', sans-serif; font-size: 1.55rem; font-weight: 800; color: var(--text); }
+  .round-per { font-size: 0.88rem; color: var(--text2); margin-top: 2px; }
+  .round-meta { display: flex; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .round-meta-item { font-size: 0.84rem; color: var(--text2); }
+  .round-meta-item span { color: var(--text); font-weight: 600; }
+
+  /* Percentage pills */
+  .pct-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .pct-pill {
+    padding: 7px 16px; border-radius: 100px;
+    background: var(--surface2); border: 1px solid var(--border);
+    font-size: 0.84rem; font-weight: 600; cursor: pointer; transition: all 0.18s; color: var(--text2);
+    font-family: 'Inter', sans-serif;
+  }
+  .pct-pill:hover, .pct-pill.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── Gas Result ── */
+  .gas-result { display: none; margin-top: 20px; }
+  .gas-result.visible { display: block; }
+
+  /* Vehicle row */
+  .gas-vehicle-row { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 0; }
+  .gas-save-btn {
+    width: 42px; height: 42px; border-radius: var(--radius-sm);
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text2); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;
+  }
+  .gas-save-btn:hover { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+
+  /* Primary rounded cost */
+  .gas-primary {
+    background: linear-gradient(135deg, rgba(255,107,53,0.18), rgba(255,107,53,0.06));
+    border: 1px solid rgba(255,107,53,0.25);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .gas-primary-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); font-weight: 600; margin-bottom: 8px; }
+  .gas-primary-val { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 900; color: var(--accent2); line-height: 1; }
+  .gas-primary-sub { font-size: 0.75rem; color: var(--text2); margin-top: 8px; }
+
+  /* Details — desktop: inline row, mobile: table */
+  .gas-details-table {
+    display: flex; align-items: center;
+    margin-top: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden;
+  }
+  .gas-detail-row {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 12px 16px; border-right: 1px solid var(--border);
+  }
+  .gas-detail-row:last-child { border-right: none; }
+  .gas-detail-key { font-size: 0.68rem; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .gas-detail-val { font-size: 0.95rem; font-weight: 700; color: var(--text); font-family: 'Outfit', sans-serif; }
+
+  .saved-car {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    margin-bottom: 8px; transition: border-color 0.2s;
+  }
+  .saved-car:last-child { margin-bottom: 0; }
+  .saved-car.is-default { border-color: rgba(255,107,53,0.4); background: rgba(255,107,53,0.06); }
+  .saved-car-icon { font-size: 1.1rem; flex-shrink: 0; }
+  .saved-car-info { flex: 1; min-width: 0; }
+  .saved-car-name { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .saved-car-sub { font-size: 0.74rem; color: var(--text2); margin-top: 1px; }
+  .saved-car-actions { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+  .star-btn {
+    background: none; border: 1px solid var(--border); border-radius: 7px;
+    width: 30px; height: 30px; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; font-size: 0.85rem; transition: all 0.18s; color: var(--text2);
+  }
+  .star-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .star-btn.starred { background: rgba(255,107,53,0.15); border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── Recipe ── */
+  #recipe-page .top-toolbar {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: center;
+  }
+  #recipe-page .top-toolbar .btn { flex-shrink: 0; }
+  .search-wrap { flex: 1; min-width: 180px; position: relative; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text2); }
+  .search-wrap input { padding-left: 38px; }
+
+  /* Recipe grid */
+  .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .recipe-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .recipe-card:hover { border-color: rgba(124,106,247,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .recipe-card-img {
+    width: 100%; height: 140px; object-fit: cover;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; color: var(--text2);
+    overflow: hidden;
+  }
+  .recipe-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .recipe-card-body { padding: 14px; }
+  .recipe-card-title { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+  .recipe-card-meta { display: flex; gap: 10px; font-size: 0.76rem; color: var(--text2); flex-wrap: wrap; }
+  .recipe-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 100px;
+    background: rgba(224,32,32,0.12); color: var(--accent);
+    font-size: 0.72rem; font-weight: 600; margin-top: 8px; margin-right: 4px;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 20px; overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; width: 100%; max-width: 680px;
+    position: relative; margin: auto;
+  }
+  .modal-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+  }
+  .modal-header h2 { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1.1rem; flex: 1; }
+  .modal-close { background: var(--surface2); border: none; color: var(--text2); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s; }
+  .modal-close:hover { background: var(--surface3); color: var(--text); }
+  .modal-body { padding: 24px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid var(--border); }
+
+  /* Recipe detail view */
+  .recipe-detail-header {
+    position: relative;
+    border-radius: var(--radius) var(--radius) 0 0;
+    overflow: hidden;
+    background: var(--surface2);
+    min-height: 200px;
+    display: flex; align-items: flex-end;
+  }
+  .recipe-detail-img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; opacity: 0.6;
+  }
+  .recipe-detail-img-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3; }
+  .recipe-detail-info {
+    position: relative; z-index: 1; padding: 20px 24px;
+    background: linear-gradient(to top, rgba(22,22,26,0.98) 0%, transparent 100%);
+    width: 100%;
+  }
+  .recipe-detail-info h2 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 1.4rem; }
+  .recipe-detail-meta { display: flex; gap: 14px; margin-top: 8px; font-size: 0.82rem; color: var(--text2); flex-wrap: wrap; }
+
+  /* Tabs inside modal */
+  .modal-tabs { display: flex; gap: 4px; padding: 16px 24px 0; border-bottom: 1px solid var(--border); }
+  .modal-tab { padding: 8px 16px; background: none; border: none; color: var(--text2); font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: all 0.2s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(224,32,32,0.07); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* Ingredient checklist */
+  .ingredient-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface2);
+    margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+    user-select: none;
+  }
+  .ingredient-item:hover { border-color: var(--accent); }
+  .ingredient-item.checked { opacity: 0.5; }
+  .ingredient-item.checked .ingredient-name { text-decoration: line-through; }
+  .check-box { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .ingredient-item.checked .check-box { background: var(--success); border-color: var(--success); }
+  .ingredient-name { font-size: 0.9rem; flex: 1; }
+  .ingredient-amount { font-size: 0.82rem; color: var(--accent2); font-weight: 600; }
+
+  /* Instruction steps */
+  .step-item {
+    display: flex; gap: 14px; padding: 14px;
+    border: 1px solid var(--border); background: var(--surface2);
+    border-radius: var(--radius-sm); margin-bottom: 10px;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .step-item:hover { border-color: var(--accent); }
+  .step-item.done { opacity: 0.5; }
+  .step-item.done .step-text { text-decoration: line-through; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; background: rgba(224,32,32,0.15); border: 2px solid rgba(224,32,32,0.35); color: var(--accent); font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .step-item.done .step-num { background: rgba(74,222,128,0.15); border-color: var(--success); color: var(--success); }
+  .step-text { font-size: 0.9rem; line-height: 1.6; }
+
+  /* Serving adjuster */
+  .serving-ctrl { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .serving-ctrl label { margin: 0; white-space: nowrap; }
+  .serving-num { display: flex; align-items: center; gap: 8px; }
+  .serving-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .serving-btn:hover { background: var(--accent); border-color: var(--accent); }
+  .serving-val { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 1rem; min-width: 28px; text-align: center; }
+
+  /* Unit toggle */
+  .unit-toggle { display: flex; gap: 4px; margin-bottom: 16px; }
+  .unit-btn { padding: 5px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; transition: all 0.2s; }
+  .unit-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* Photo gallery */
+  .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 12px; }
+  .photo-thumb { border-radius: 10px; overflow: hidden; aspect-ratio: 1; background: var(--surface2); cursor: pointer; position: relative; }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-thumb-date { position: absolute; bottom: 4px; left: 4px; right: 4px; font-size: 0.65rem; background: rgba(0,0,0,0.7); border-radius: 4px; padding: 2px 5px; color: #fff; text-align: center; }
+
+  /* Share output */
+  .share-output {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 18px;
+    font-family: 'Inter', sans-serif; font-size: 0.88rem; line-height: 1.7;
+    white-space: pre-wrap; max-height: 300px; overflow-y: auto;
+    color: var(--text);
+  }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 14px; opacity: 0.4; }
+  .empty-state p { font-size: 0.9rem; }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+  /* Notification toast */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--surface3); border: 1px solid var(--border); border-radius: 100px;
+    padding: 10px 20px; font-size: 0.85rem; font-weight: 500;
+    opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Spinner */
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Responsive ── */
+  @media (max-width: 640px) {
+    .top-nav { display: none; }
+    .hamburger { display: flex; }
+    .page { padding: 20px 14px 40px; }
+    .card { padding: 16px 14px; }
+    .input-row { grid-template-columns: 1fr; }
+    .input-row.three { grid-template-columns: 1fr; }
+    .tip-result { padding: 14px 12px; }
+    .tip-result-grid { gap: 8px; }
+    .tip-stat-val { font-size: 1.15rem; }
+  .gas-make-model-row { grid-template-columns: 1fr 1fr !important; }
+    .round-grid { gap: 8px; }
+    .round-box { padding: 12px 14px; }
+    .round-box-title { font-size: 0.8rem; }
+    .round-box-badge { font-size: 0.76rem; padding: 3px 9px; }
+    .round-total { font-size: 1.45rem; }
+    .round-meta { gap: 8px; margin-top: 8px; padding-top: 8px; }
+    .round-meta-item { font-size: 0.84rem; }
+    .gas-details-table { flex-direction: column; }
+    .gas-detail-row { flex: unset; width: 100%; flex-direction: row; justify-content: space-between; align-items: center; border-right: none; border-bottom: 1px solid var(--border); padding: 10px 14px; }
+    .gas-detail-row:last-child { border-bottom: none; }
+    .gas-detail-key { margin-bottom: 0; font-size: 0.78rem; text-align: left; }
+    .gas-detail-val { font-size: 0.88rem; text-align: right; }
+    .modal { border-radius: 20px 20px 0 0; margin: auto 0 0 0; max-width: 100%; }
+    .modal-overlay { padding: 0; align-items: flex-end; }
+    .recipe-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 380px) {
+    .recipe-grid { grid-template-columns: 1fr; }
+  }
+
+  /* AI loading state */
+  .ai-generating {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px; background: rgba(224,32,32,0.06);
+    border: 1px dashed rgba(224,32,32,0.3);
+    border-radius: var(--radius-sm); margin-top: 12px;
+    color: var(--text2); font-size: 0.88rem;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="logo"><span class="logo-dot"></span>My Toolkit</div>
+    <button class="nav-btn active" onclick="showPage('tip')" id="nav-tip">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 11H5a1 1 0 0 1 0 2 6 6 0 0 0 12 0 1 1 0 0 1 2 0 8 8 0 0 1-6 5.93z"/></svg>
+      Tip Calculator
+    </button>
+    <button class="nav-btn" onclick="showPage('gas')" id="nav-gas">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M3 22h14M3 10h14M9 6v4"/><path d="M17 6h2l2 2v4h-4"/></svg>
+      Gas Calculator
+    </button>
+    <button class="nav-btn" onclick="showPage('recipe')" id="nav-recipe">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Recipe Book
+    </button>
+  </nav>
+
+  <!-- Hamburger (mobile) -->
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-dot"></span>My Toolkit</div>
+    <button class="sidebar-btn active" id="sb-tip" onclick="showPage('tip');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+      Tip Calculator
+    </button>
+    <button class="sidebar-btn" id="sb-gas" onclick="showPage('gas');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M3 22h14M3 10h14"/><path d="M17 6h2l2 2v4h-4"/></svg>
+      Gas Calculator
+    </button>
+    <button class="sidebar-btn" id="sb-recipe" onclick="showPage('recipe');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Recipe Book
+    </button>
+  </div>
+
+  <!-- ════════ TIP CALCULATOR ════════ -->
+  <div class="page active" id="tip-page">
+    <div class="page-header">
+      <div class="accent-line"></div>
+      <h1>Tip Calculator</h1>
+      <p>Split bills fairly — no math stress.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bill Details</div>
+      <div class="input-group">
+        <label>Bill Amount ($)</label>
+        <div class="input-wrap">
+          <input type="text" id="bill-amount" placeholder="0.00" inputmode="numeric" oninput="handleCurrencyInput(this)" onfocus="selectAll(this)">
+          <button class="input-clear" onclick="clearField('bill-amount')">✕</button>
+        </div>
+      </div>
+
+      <label>Tip Percentage</label>
+      <div class="pct-pills" id="pct-pills">
+        <div class="pct-pill selected" onclick="selectPct(this,10)">10%</div>
+        <div class="pct-pill" onclick="selectPct(this,15)">15%</div>
+        <div class="pct-pill" onclick="selectPct(this,18)">18%</div>
+        <div class="pct-pill" onclick="selectPct(this,20)">20%</div>
+        <div class="pct-pill" onclick="selectPct(this,25)">25%</div>
+        <div class="pct-pill" id="custom-pill" onclick="toggleCustomField(this)">--</div>
+      </div>
+      <div class="input-group" id="custom-tip-group" style="display:none">
+        <label>Custom Tip %</label>
+        <div class="input-wrap">
+          <input type="text" id="custom-tip" placeholder="e.g. 22" inputmode="numeric" oninput="handleCustomTip(this)" onfocus="selectAll(this)">
+          <button class="input-clear" onclick="clearField('custom-tip')">✕</button>
+        </div>
+      </div>
+
+      <div class="tip-result" id="tip-result">
+        <div class="tip-result-grid" style="grid-template-columns:1fr 1fr">
+          <div class="tip-stat">
+            <div class="tip-stat-val" id="res-tip-amt">$0.00</div>
+            <div class="tip-stat-lbl">Tip Amount</div>
+          </div>
+          <div class="tip-stat">
+            <div class="tip-stat-val" id="res-total">$0.00</div>
+            <div class="tip-stat-lbl">Total Bill</div>
+          </div>
+        </div>
+
+        <hr class="round-divider">
+        <div class="round-grid">
+          <div class="round-box">
+            <div class="round-box-header">
+              <span class="round-box-title">Round Down</span>
+              <span class="round-box-badge badge-down" id="rd-badge">▼ −$0.00</span>
+            </div>
+            <div class="round-total" id="rd-total">$0.00</div>
+            <div class="round-meta">
+              <div class="round-meta-item">Actual tip: <span id="rd-tip-pct">0%</span></div>
+              <div class="round-meta-item">Tip amount: <span id="rd-tip-amt">$0.00</span></div>
+            </div>
+          </div>
+          <div class="round-box">
+            <div class="round-box-header">
+              <span class="round-box-title">Round Up</span>
+              <span class="round-box-badge badge-up" id="ru-badge">▲ +$0.00</span>
+            </div>
+            <div class="round-total" id="ru-total">$0.00</div>
+            <div class="round-meta">
+              <div class="round-meta-item">Actual tip: <span id="ru-tip-pct">0%</span></div>
+              <div class="round-meta-item">Tip amount: <span id="ru-tip-amt">$0.00</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ GAS CALCULATOR ════════ -->
+  <div class="page" id="gas-page">
+    <div class="page-header">
+      <div class="accent-line" style="background:var(--accent2)"></div>
+      <h1>Gas Calculator</h1>
+      <p>Know exactly how much that fill-up will cost.</p>
+    </div>
+
+    <!-- Saved Vehicles Garage -->
+    <div class="card" id="saved-car-card" style="display:none">
+      <div class="card-title">My Garage</div>
+      <div id="saved-car-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Vehicle & Fuel Details</div>
+
+      <!-- Make + Model + Save icon all on one row -->
+      <div class="gas-vehicle-row">
+        <div class="input-group" style="flex:1;margin-bottom:0">
+          <label>Car Make</label>
+          <select id="car-make" onchange="populateModels()">
+            <option value="">Select Make</option>
+            <option>Acura</option><option>Toyota</option><option>Honda</option><option>Ford</option>
+            <option>Chevrolet</option><option>BMW</option><option>Mercedes-Benz</option>
+            <option>Volkswagen</option><option>Hyundai</option><option>Kia</option>
+            <option>Nissan</option><option>Subaru</option><option>Mazda</option>
+            <option>Audi</option><option>Lexus</option><option>Ram</option>
+            <option>GMC</option><option>Jeep</option><option>Tesla</option>
+            <option>Dodge</option><option>Chrysler</option><option>Other</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;margin-bottom:0">
+          <label>Model</label>
+          <select id="car-model" onchange="autoFillTank()"><option value="">—</option></select>
+        </div>
+        <div style="padding-top:22px;flex-shrink:0">
+          <button class="gas-save-btn" onclick="saveCar()" title="Save vehicle">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="input-row" style="margin-top:14px">
+        <div class="input-group">
+          <label>Gas Leftover (%)</label>
+          <div class="input-wrap">
+            <input type="text" id="tank-level" placeholder="e.g. 25" inputmode="numeric" oninput="handleLevelInput(this)">
+            <button class="input-clear" onclick="clearField('tank-level')">✕</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Gas Price ($/gal)</label>
+          <div class="input-wrap">
+            <input type="text" id="gas-price" placeholder="e.g. 3.45" inputmode="decimal" oninput="calcGas()">
+            <button class="input-clear" onclick="clearField('gas-price')">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gas-result" id="gas-result">
+        <!-- Primary: Rounded Cost -->
+        <div class="gas-primary">
+          <div class="gas-primary-label">Pay approximately</div>
+          <div class="gas-primary-val" id="res-rounded-cost">$0.00</div>
+          <div class="gas-primary-sub">rounded to nearest dollar</div>
+        </div>
+        <!-- Secondary details as a clean table -->
+        <div class="gas-details-table">
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Tank Size</span>
+            <span class="gas-detail-val" id="res-tank-size">—</span>
+          </div>
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Gal. Needed</span>
+            <span class="gas-detail-val" id="res-gallons">—</span>
+          </div>
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Exact Cost</span>
+            <span class="gas-detail-val" id="res-fill-cost">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ RECIPE BOOK ════════ -->
+  <div class="page" id="recipe-page">
+    <div class="page-header">
+      <div class="accent-line" style="background:var(--accent3)"></div>
+      <h1>Recipe Book</h1>
+      <p>Your kitchen, your collection.</p>
+    </div>
+
+    <div class="top-toolbar">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search recipes…" id="recipe-search" oninput="renderRecipes()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('new-recipe-modal')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        New
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="importRecipe()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import
+      </button>
+    </div>
+
+    <div class="recipe-grid" id="recipe-grid"></div>
+    <div class="empty-state" id="recipe-empty" style="display:none">
+      <div class="icon">🍳</div>
+      <p>No recipes yet. Add your first one!</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ RECIPE DETAIL MODAL ════ -->
+<div class="modal-overlay" id="recipe-detail-modal">
+  <div class="modal" style="max-width:720px">
+    <div class="recipe-detail-header" id="detail-hero" style="min-height:180px">
+      <div class="recipe-detail-img-placeholder" id="detail-emoji">🍽️</div>
+      <img id="detail-hero-img" src="" alt="" style="display:none" class="recipe-detail-img">
+      <div class="recipe-detail-info">
+        <h2 id="detail-title">Recipe Title</h2>
+        <div class="recipe-detail-meta">
+          <span id="detail-time">⏱ 30 min</span>
+          <span id="detail-servings-label">👤 4 servings</span>
+          <span id="detail-category">🏷 Dinner</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls bar -->
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--border)">
+      <div class="serving-ctrl" style="margin:0">
+        <label style="margin:0;font-size:0.82rem">Servings:</label>
+        <div class="serving-num">
+          <button class="serving-btn" onclick="adjustServings(-1)">−</button>
+          <span class="serving-val" id="cur-servings">4</span>
+          <button class="serving-btn" onclick="adjustServings(1)">+</button>
+        </div>
+      </div>
+      <div class="unit-toggle" style="margin:0">
+        <button class="unit-btn active" id="unit-us" onclick="setUnit('us')">US</button>
+        <button class="unit-btn" id="unit-metric" onclick="setUnit('metric')">Metric</button>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-ghost" onclick="shareRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-sm btn-success" onclick="exportRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCurrentRecipe()">Delete</button>
+      </div>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('tab-ingredients','recipe-detail-modal')">Ingredients</button>
+      <button class="modal-tab" onclick="switchTab('tab-instructions','recipe-detail-modal')">Instructions</button>
+      <button class="modal-tab" onclick="switchTab('tab-photos','recipe-detail-modal')">Photos</button>
+    </div>
+
+    <div class="modal-body" style="max-height:50vh;overflow-y:auto">
+      <div class="tab-pane active" id="tab-ingredients">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-sm btn-ghost" onclick="clearChecked()">Clear Checks</button>
+        </div>
+        <div id="ingredients-list"></div>
+      </div>
+      <div class="tab-pane" id="tab-instructions">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-sm btn-ghost" onclick="clearDone()">Reset Steps</button>
+        </div>
+        <div id="instructions-list"></div>
+      </div>
+      <div class="tab-pane" id="tab-photos">
+        <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center">
+          <button class="btn btn-sm btn-primary" onclick="triggerPhotoUpload()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Add Photos
+          </button>
+          <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(this)">
+        </div>
+        <div class="photo-grid" id="photo-grid"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('recipe-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ NEW RECIPE MODAL ════ -->
+<div class="modal-overlay" id="new-recipe-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✨ New Recipe</h2>
+      <button class="modal-close" onclick="closeModal('new-recipe-modal')">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('nr-manual','new-recipe-modal')">Manual</button>
+      <button class="modal-tab" onclick="switchTab('nr-ai','new-recipe-modal')">AI Generate</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+
+      <!-- Manual -->
+      <div class="tab-pane active" id="nr-manual">
+        <div class="input-group">
+          <label>Recipe Name *</label>
+          <input type="text" id="nr-name" placeholder="e.g. Grandma's Lasagna">
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>Category</label>
+            <select id="nr-category">
+              <option>Breakfast</option><option>Lunch</option><option selected>Dinner</option>
+              <option>Snack</option><option>Dessert</option><option>Drink</option><option>Other</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Cook Time (min)</label>
+            <input type="number" id="nr-time" placeholder="30" min="1">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Base Servings</label>
+          <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
+        </div>
+        <div class="input-group">
+          <label>Emoji (optional)</label>
+          <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
+        </div>
+        <hr class="divider">
+        <div class="input-group">
+          <label>Ingredients (one per line: "1 cup flour" or "2 eggs")</label>
+          <textarea id="nr-ingredients" placeholder="2 cups flour&#10;3 eggs&#10;1 cup milk&#10;2 tbsp butter"></textarea>
+        </div>
+        <div class="input-group">
+          <label>Instructions (one step per line)</label>
+          <textarea id="nr-instructions" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients and stir&#10;Bake for 25-30 minutes"></textarea>
+        </div>
+      </div>
+
+      <!-- AI Generate -->
+      <div class="tab-pane" id="nr-ai">
+        <div style="margin-bottom:14px;padding:14px;background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);border-radius:var(--radius-sm)">
+          <p style="font-size:0.85rem;color:var(--text2)">✨ Describe what you want and AI will generate a complete recipe for you.</p>
+        </div>
+        <div class="input-group">
+          <label>What would you like to make?</label>
+          <textarea id="ai-prompt" placeholder="e.g. A creamy pasta with spinach and sun-dried tomatoes, vegetarian, serves 4, under 30 minutes" style="min-height:80px"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="generateAIRecipe()" id="ai-generate-btn">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Generate Recipe
+        </button>
+        <div id="ai-loading" style="display:none" class="ai-generating">
+          <div class="spinner"></div> AI is crafting your recipe…
+        </div>
+        <div id="ai-preview" style="display:none;margin-top:16px">
+          <p style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;font-weight:600">✅ Recipe generated! Review and save:</p>
+          <div id="ai-preview-content" class="share-output" style="max-height:200px"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('new-recipe-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewRecipe()" id="save-recipe-btn">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SHARE MODAL ════ -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2>📤 Share Recipe</h2>
+      <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text2);margin-bottom:14px">Copy this formatted recipe to share with anyone.</p>
+      <div class="share-output" id="share-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('share-modal')">Close</button>
+      <button class="btn btn-primary" onclick="copyShare()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy to Clipboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PHOTO DATE MODAL ════ -->
+<div class="modal-overlay" id="photo-date-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2>📷 Add Photo Date</h2>
+      <button class="modal-close" onclick="closeModal('photo-date-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="photo-date-preview" style="width:100%;height:160px;border-radius:10px;background:var(--surface2);overflow:hidden;margin-bottom:14px;display:flex;align-items:center;justify-content:center">
+        <img id="photo-date-img" src="" style="max-width:100%;max-height:100%;object-fit:cover;border-radius:10px">
+      </div>
+      <div class="input-group">
+        <label>Date Taken</label>
+        <input type="date" id="photo-date-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('photo-date-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmPhotoDate()">Add Photo</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let recipes = JSON.parse(localStorage.getItem('recipes') || '[]');
+let currentRecipe = null;
+let currentServings = 4;
+let baseServings = 4;
+let currentUnit = 'us';
+let aiGeneratedRecipe = null;
+let pendingPhotos = [];
+let pendingPhotoIndex = 0;
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(name + '-page').classList.add('active');
+  const nb = document.getElementById('nav-' + name);
+  const sb = document.getElementById('sb-' + name);
+  if (nb) nb.classList.add('active');
+  if (sb) sb.classList.add('active');
+  if (name === 'recipe') renderRecipes();
+  if (name === 'gas') { renderSavedCar(); loadSavedCar(); }
+}
+
+function toggleSidebar() {
+  const open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('open', open);
+  document.getElementById('hamburger').classList.toggle('open', open);
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
+
+// ══════════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+});
+
+function switchTab(tabId, modalId) {
+  const modal = document.getElementById(modalId);
+  modal.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  modal.querySelectorAll('.modal-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  // find the button
+  modal.querySelectorAll('.modal-tab').forEach(b => {
+    if (b.getAttribute('onclick').includes(tabId)) b.classList.add('active');
+  });
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════
+// TIP CALCULATOR
+// ══════════════════════════════════════════════
+let tipPct = 10;
+
+function selectAll(el) { setTimeout(() => el.select(), 0); }
+
+function clearField(id) {
+  const el = document.getElementById(id);
+  el.value = '';
+  el.dispatchEvent(new Event('input'));
+  el.focus();
+}
+
+// Auto-decimal: treat input as cents and format as dollars
+function handleCurrencyInput(el) {
+  let raw = el.value.replace(/[^0-9]/g, '');
+  if (raw === '') { el.value = ''; calcTip(); return; }
+  const cents = parseInt(raw, 10);
+  const dollars = (cents / 100).toFixed(2);
+  el.value = dollars;
+  // keep cursor at end
+  setTimeout(() => { el.selectionStart = el.selectionEnd = el.value.length; }, 0);
+  calcTip();
+}
+
+function handlePeopleInput(el) {
+  let raw = el.value.replace(/[^0-9]/g, '');
+  if (raw === '') { el.value = ''; calcTip(); return; }
+  el.value = parseInt(raw, 10).toString();
+  calcTip();
+}
+
+function handleCustomTip(el) {
+  let raw = el.value.replace(/[^0-9.]/g, '');
+  el.value = raw;
+  if (raw !== '') {
+    const v = parseFloat(raw);
+    if (!isNaN(v)) {
+      document.querySelectorAll('.pct-pill').forEach(p => p.classList.remove('selected'));
+      tipPct = v;
+      calcTip();
+    }
+  }
+}
+
+function toggleCustomField(el) {
+  const group = document.getElementById('custom-tip-group');
+  const isOpen = group.style.display !== 'none';
+  if (isOpen) {
+    group.style.display = 'none';
+    el.classList.remove('selected');
+    // restore previously selected preset if any
+    document.getElementById('custom-tip').value = '';
+    tipPct = 10;
+    document.querySelector('.pct-pill:not(#custom-pill)').classList.add('selected');
+    calcTip();
+  } else {
+    document.querySelectorAll('.pct-pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    group.style.display = 'block';
+    setTimeout(() => document.getElementById('custom-tip').focus(), 50);
+  }
+}
+
+function selectPct(el, pct) {
+  document.querySelectorAll('.pct-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  tipPct = pct;
+  // hide custom field if open
+  document.getElementById('custom-tip-group').style.display = 'none';
+  document.getElementById('custom-tip').value = '';
+  calcTip();
+}
+
+function calcTip() {
+  const bill = parseFloat(document.getElementById('bill-amount').value) || 0;
+
+  const tip = bill * (tipPct / 100);
+  const total = bill + tip;
+
+  document.getElementById('res-tip-amt').textContent = '$' + tip.toFixed(2);
+  document.getElementById('res-total').textContent = '$' + total.toFixed(2);
+
+  const show = bill > 0;
+  document.getElementById('tip-result').classList.toggle('visible', show);
+
+  if (show) {
+    // Round to nearest $0.25
+    const rdTotal = Math.floor(total);
+    const rdTip = rdTotal - bill;
+    const rdDiff = total - rdTotal;
+    const rdPct = bill > 0 ? (rdTip / bill * 100) : 0;
+
+    document.getElementById('rd-total').textContent = '$' + rdTotal.toFixed(2);
+    document.getElementById('rd-badge').textContent = '▼ −$' + rdDiff.toFixed(2);
+    document.getElementById('rd-tip-pct').textContent = rdPct.toFixed(1) + '%';
+    document.getElementById('rd-tip-amt').textContent = '$' + Math.max(0, rdTip).toFixed(2);
+
+    const ruTotal = Math.ceil(total);
+    const ruTip = ruTotal - bill;
+    const ruDiff = ruTotal - total;
+    const ruPct = bill > 0 ? (ruTip / bill * 100) : 0;
+
+    document.getElementById('ru-total').textContent = '$' + ruTotal.toFixed(2);
+    document.getElementById('ru-badge').textContent = '▲ +$' + ruDiff.toFixed(2);
+    document.getElementById('ru-tip-pct').textContent = ruPct.toFixed(1) + '%';
+    document.getElementById('ru-tip-amt').textContent = '$' + ruTip.toFixed(2);
+  }
+}
+
+// Legacy wrapper
+function selectCustom() { handleCustomTip(document.getElementById('custom-tip')); }
+
+// ══════════════════════════════════════════════
+// GAS CALCULATOR
+// ══════════════════════════════════════════════
+const carModels = {
+  Acura: ['ILX','TLX','RLX','MDX','RDX','ZDX','NSX','Integra'],
+  Toyota: ['Camry','Corolla','RAV4','Highlander','Tacoma','Tundra','Sienna','Prius','4Runner','Sequoia'],
+  Honda: ['Civic','Accord','CR-V','Pilot','Odyssey','Ridgeline','Passport','HR-V','Fit'],
+  Ford: ['F-150','Escape','Explorer','Mustang','Edge','Bronco','Maverick','Expedition','Ranger'],
+  Chevrolet: ['Silverado','Equinox','Traverse','Malibu','Blazer','Tahoe','Suburban','Colorado','Trax'],
+  BMW: ['3 Series','5 Series','7 Series','X3','X5','X7','M3','M5','i4','iX'],
+  'Mercedes-Benz': ['C-Class','E-Class','S-Class','GLC','GLE','GLS','A-Class','CLA','AMG GT'],
+  Volkswagen: ['Jetta','Passat','Tiguan','Atlas','Golf','ID.4','Arteon'],
+  Hyundai: ['Elantra','Sonata','Tucson','Santa Fe','Palisade','Kona','Ioniq 5','Ioniq 6'],
+  Kia: ['Forte','K5','Sportage','Sorento','Telluride','Soul','EV6','Carnival'],
+  Nissan: ['Altima','Maxima','Sentra','Rogue','Pathfinder','Murano','Frontier','Armada','Leaf'],
+  Subaru: ['Impreza','Legacy','Outback','Forester','Crosstrek','Ascent','BRZ','WRX'],
+  Mazda: ['Mazda3','Mazda6','CX-5','CX-9','CX-30','CX-50','MX-5 Miata'],
+  Audi: ['A3','A4','A6','A8','Q3','Q5','Q7','e-tron','RS6'],
+  Lexus: ['IS','ES','LS','GX','RX','NX','UX','LX'],
+  Ram: ['1500','2500','3500','ProMaster'],
+  GMC: ['Sierra 1500','Acadia','Terrain','Yukon','Canyon'],
+  Jeep: ['Wrangler','Grand Cherokee','Cherokee','Compass','Gladiator','Renegade'],
+  Tesla: ['Model 3','Model Y','Model S','Model X','Cybertruck'],
+  Dodge: ['Charger','Challenger','Durango','Hornet'],
+  Chrysler: ['300','Pacifica','Voyager'],
+  Other: ['Other']
+};
+
+// Tank size lookup (gallons) — common trim averages
+const tankSizes = {
+  'Acura ILX': 13.2, 'Acura TLX': 17.1, 'Acura RLX': 17.2,
+  'Acura MDX': 19.5, 'Acura RDX': 17.1, 'Acura ZDX': null,
+  'Acura NSX': 15.9, 'Acura Integra': 12.4,
+  'Toyota Camry': 15.9, 'Toyota Corolla': 13.2, 'Toyota RAV4': 14.5,
+  'Toyota Highlander': 17.9, 'Toyota Tacoma': 21.1, 'Toyota Tundra': 22.5,
+  'Toyota Sienna': 18.0, 'Toyota Prius': 11.3, 'Toyota 4Runner': 23.0,
+  'Toyota Sequoia': 22.5,
+  'Honda Civic': 12.4, 'Honda Accord': 14.8, 'Honda CR-V': 14.0,
+  'Honda Pilot': 19.5, 'Honda Odyssey': 19.5, 'Honda Ridgeline': 19.5,
+  'Honda Passport': 19.5, 'Honda HR-V': 13.2, 'Honda Fit': 10.6,
+  'Ford F-150': 23.0, 'Ford Escape': 14.8, 'Ford Explorer': 18.0,
+  'Ford Mustang': 16.0, 'Ford Edge': 18.0, 'Ford Bronco': 16.9,
+  'Ford Maverick': 15.5, 'Ford Expedition': 28.0, 'Ford Ranger': 18.0,
+  'Chevrolet Silverado': 24.0, 'Chevrolet Equinox': 14.9, 'Chevrolet Traverse': 21.7,
+  'Chevrolet Malibu': 15.8, 'Chevrolet Blazer': 18.3, 'Chevrolet Tahoe': 25.1,
+  'Chevrolet Suburban': 28.0, 'Chevrolet Colorado': 21.0, 'Chevrolet Trax': 11.9,
+  'BMW 3 Series': 15.6, 'BMW 5 Series': 15.6, 'BMW 7 Series': 21.9,
+  'BMW X3': 16.6, 'BMW X5': 21.9, 'BMW X7': 21.9,
+  'BMW M3': 15.6, 'BMW M5': 15.6, 'BMW i4': null, 'BMW iX': null,
+  'Mercedes-Benz C-Class': 16.1, 'Mercedes-Benz E-Class': 17.4, 'Mercedes-Benz S-Class': 21.1,
+  'Mercedes-Benz GLC': 16.1, 'Mercedes-Benz GLE': 21.1, 'Mercedes-Benz GLS': 26.4,
+  'Mercedes-Benz A-Class': 12.4, 'Mercedes-Benz CLA': 13.7, 'Mercedes-Benz AMG GT': 16.4,
+  'Volkswagen Jetta': 13.2, 'Volkswagen Passat': 18.5, 'Volkswagen Tiguan': 15.9,
+  'Volkswagen Atlas': 18.6, 'Volkswagen Golf': 13.2, 'Volkswagen ID.4': null, 'Volkswagen Arteon': 15.9,
+  'Hyundai Elantra': 12.4, 'Hyundai Sonata': 15.9, 'Hyundai Tucson': 14.3,
+  'Hyundai Santa Fe': 17.7, 'Hyundai Palisade': 18.8, 'Hyundai Kona': 13.2,
+  'Hyundai Ioniq 5': null, 'Hyundai Ioniq 6': null,
+  'Kia Forte': 13.2, 'Kia K5': 15.9, 'Kia Sportage': 14.3,
+  'Kia Sorento': 17.7, 'Kia Telluride': 18.8, 'Kia Soul': 14.3,
+  'Kia EV6': null, 'Kia Carnival': 21.1,
+  'Nissan Altima': 16.2, 'Nissan Maxima': 18.0, 'Nissan Sentra': 12.4,
+  'Nissan Rogue': 14.5, 'Nissan Pathfinder': 19.5, 'Nissan Murano': 20.0,
+  'Nissan Frontier': 21.0, 'Nissan Armada': 26.0, 'Nissan Leaf': null,
+  'Subaru Impreza': 13.2, 'Subaru Legacy': 16.9, 'Subaru Outback': 18.5,
+  'Subaru Forester': 16.6, 'Subaru Crosstrek': 15.9, 'Subaru Ascent': 19.3,
+  'Subaru BRZ': 13.2, 'Subaru WRX': 15.9,
+  'Mazda Mazda3': 13.2, 'Mazda Mazda6': 15.9, 'Mazda CX-5': 15.3,
+  'Mazda CX-9': 19.5, 'Mazda CX-30': 13.2, 'Mazda CX-50': 15.3, 'Mazda MX-5 Miata': 11.9,
+  'Audi A3': 13.2, 'Audi A4': 15.9, 'Audi A6': 17.7,
+  'Audi A8': 21.1, 'Audi Q3': 15.3, 'Audi Q5': 19.8,
+  'Audi Q7': 22.5, 'Audi e-tron': null, 'Audi RS6': 17.7,
+  'Lexus IS': 17.4, 'Lexus ES': 17.4, 'Lexus LS': 22.4,
+  'Lexus GX': 23.3, 'Lexus RX': 17.4, 'Lexus NX': 14.8,
+  'Lexus UX': 13.2, 'Lexus LX': 24.6,
+  'Ram 1500': 26.0, 'Ram 2500': 26.0, 'Ram 3500': 26.0, 'Ram ProMaster': 24.6,
+  'GMC Sierra 1500': 24.0, 'GMC Acadia': 21.7, 'GMC Terrain': 14.9,
+  'GMC Yukon': 28.0, 'GMC Canyon': 21.0,
+  'Jeep Wrangler': 21.5, 'Jeep Grand Cherokee': 24.6, 'Jeep Cherokee': 15.8,
+  'Jeep Compass': 13.5, 'Jeep Gladiator': 21.5, 'Jeep Renegade': 12.9,
+  'Tesla Model 3': null, 'Tesla Model Y': null, 'Tesla Model S': null,
+  'Tesla Model X': null, 'Tesla Cybertruck': null,
+  'Dodge Charger': 18.5, 'Dodge Challenger': 18.5, 'Dodge Durango': 24.6, 'Dodge Hornet': 13.2,
+  'Chrysler 300': 18.5, 'Chrysler Pacifica': 19.5, 'Chrysler Voyager': 19.5,
+};
+
+function populateModels() {
+  const make = document.getElementById('car-make').value;
+  const modelSel = document.getElementById('car-model');
+  modelSel.innerHTML = '';
+  if (!make) { modelSel.innerHTML = '<option>Select Make First</option>'; return; }
+  (carModels[make] || ['Other']).forEach(m => {
+    const o = document.createElement('option'); o.value = m; o.textContent = m; modelSel.appendChild(o);
+  });
+  autoFillTank();
+}
+
+let currentTankSize = 0;
+
+function autoFillTank() {
+  const make = document.getElementById('car-make').value;
+  const model = document.getElementById('car-model').value;
+  const key = make + ' ' + model;
+  const tank = tankSizes[key];
+  currentTankSize = (tank !== undefined && tank !== null) ? tank : 0;
+  calcGas();
+}
+
+function handleLevelInput(el) {
+  let raw = el.value.replace(/[^0-9.]/g, '');
+  if (raw !== '' && parseFloat(raw) > 100) raw = '100';
+  el.value = raw;
+  calcGas();
+}
+
+function calcGas() {
+  const tank = currentTankSize;
+  const level = parseFloat(document.getElementById('tank-level').value) || 0;
+  const price = parseFloat(document.getElementById('gas-price').value) || 0;
+  if (tank <= 0 || price <= 0) { document.getElementById('gas-result').classList.remove('visible'); return; }
+  const gallonsNeeded = tank * (1 - level / 100);
+  const fillCost = gallonsNeeded * price;
+  document.getElementById('res-tank-size').textContent = tank + ' gal';
+  document.getElementById('res-gallons').textContent = gallonsNeeded.toFixed(2) + ' gal';
+  document.getElementById('res-fill-cost').textContent = '$' + fillCost.toFixed(2);
+  document.getElementById('res-rounded-cost').textContent = '$' + Math.round(fillCost).toFixed(2);
+  document.getElementById('gas-result').classList.add('visible');
+}
+
+function saveCar() {
+  const make = document.getElementById('car-make').value;
+  const model = document.getElementById('car-model').value;
+  if (!make || !model) { showToast('Select a make and model first'); return; }
+  const cars = JSON.parse(localStorage.getItem('savedCars') || '[]');
+  const already = cars.find(c => c.make === make && c.model === model);
+  if (already) { showToast('Already saved!'); return; }
+  const id = Date.now().toString();
+  cars.push({ id, make, model, tank: currentTankSize });
+  localStorage.setItem('savedCars', JSON.stringify(cars));
+  renderSavedCar();
+  showToast('🚗 Vehicle saved!');
+}
+
+function renderSavedCar() {
+  const cars = JSON.parse(localStorage.getItem('savedCars') || '[]');
+  const defaultId = localStorage.getItem('defaultCar');
+  const card = document.getElementById('saved-car-card');
+  const list = document.getElementById('saved-car-list');
+  if (cars.length === 0) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = '';
+  cars.forEach(car => {
+    const isDefault = car.id === defaultId;
+    const row = document.createElement('div');
+    row.className = 'saved-car' + (isDefault ? ' is-default' : '');
+    row.innerHTML = `
+      <div class="saved-car-icon">🚗</div>
+      <div class="saved-car-info">
+        <div class="saved-car-name">${car.make} ${car.model}</div>
+        <div class="saved-car-sub">${car.tank ? car.tank + ' gal tank' : 'Tank unknown'}${isDefault ? ' · <span style="color:var(--accent2)">Default</span>' : ''}</div>
+      </div>
+      <div class="saved-car-actions">
+        <button class="star-btn ${isDefault ? 'starred' : ''}" title="Set as default" onclick="setDefaultCar('${car.id}')">★</button>
+        <button class="btn btn-sm btn-ghost" onclick="loadCarById('${car.id}')">Load</button>
+        <button class="btn btn-sm btn-danger" onclick="removeCarById('${car.id}')">✕</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function setDefaultCar(id) {
+  localStorage.setItem('defaultCar', id);
+  renderSavedCar();
+  showToast('⭐ Set as default vehicle');
+}
+
+function loadCarById(id) {
+  const cars = JSON.parse(localStorage.getItem('savedCars') || '[]');
+  const car = cars.find(c => c.id === id);
+  if (!car) return;
+  document.getElementById('car-make').value = car.make;
+  populateModels();
+  document.getElementById('car-model').value = car.model;
+  currentTankSize = car.tank || 0;
+  calcGas();
+  showToast('Vehicle loaded!');
+}
+
+function removeCarById(id) {
+  let cars = JSON.parse(localStorage.getItem('savedCars') || '[]');
+  cars = cars.filter(c => c.id !== id);
+  localStorage.setItem('savedCars', JSON.stringify(cars));
+  const defaultId = localStorage.getItem('defaultCar');
+  if (defaultId === id) localStorage.removeItem('defaultCar');
+  renderSavedCar();
+  showToast('Vehicle removed');
+}
+
+function loadSavedCar() {
+  const cars = JSON.parse(localStorage.getItem('savedCars') || '[]');
+  if (cars.length === 0) return;
+  const defaultId = localStorage.getItem('defaultCar');
+  const car = cars.find(c => c.id === defaultId) || cars[0];
+  document.getElementById('car-make').value = car.make;
+  populateModels();
+  document.getElementById('car-model').value = car.model;
+  currentTankSize = car.tank || 0;
+  calcGas();
+}
+
+function clearSavedCar() {
+  localStorage.removeItem('savedCars');
+  localStorage.removeItem('defaultCar');
+  renderSavedCar();
+  showToast('All vehicles removed');
+}
+
+// ══════════════════════════════════════════════
+// RECIPE BOOK
+// ══════════════════════════════════════════════
+function saveRecipes() { localStorage.setItem('recipes', JSON.stringify(recipes)); }
+
+function renderRecipes() {
+  const search = (document.getElementById('recipe-search').value || '').toLowerCase();
+  const grid = document.getElementById('recipe-grid');
+  const empty = document.getElementById('recipe-empty');
+  const filtered = recipes.filter(r => r.name.toLowerCase().includes(search) || (r.category || '').toLowerCase().includes(search));
+  grid.innerHTML = '';
+  if (filtered.length === 0) { empty.style.display = 'block'; grid.style.display = 'none'; return; }
+  empty.style.display = 'none'; grid.style.display = 'grid';
+  filtered.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'recipe-card';
+    el.onclick = () => openRecipe(r.id);
+    const imgHtml = r.photos && r.photos.length > 0
+      ? `<img src="${r.photos[0].data}" alt="">`
+      : (r.emoji || '🍽️');
+    el.innerHTML = `
+      <div class="recipe-card-img">${imgHtml}</div>
+      <div class="recipe-card-body">
+        <div class="recipe-card-title">${r.name}</div>
+        <div class="recipe-card-meta">
+          <span>⏱ ${r.time || '?'} min</span>
+          <span>👤 ${r.servings || 4}</span>
+        </div>
+        <span class="recipe-tag">${r.category || 'Other'}</span>
+      </div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+function openRecipe(id) {
+  currentRecipe = recipes.find(r => r.id === id);
+  if (!currentRecipe) return;
+  baseServings = currentRecipe.servings || 4;
+  currentServings = baseServings;
+  currentUnit = 'us';
+
+  document.getElementById('detail-title').textContent = currentRecipe.name;
+  document.getElementById('detail-time').textContent = '⏱ ' + (currentRecipe.time || '?') + ' min';
+  document.getElementById('detail-category').textContent = '🏷 ' + (currentRecipe.category || 'Other');
+  document.getElementById('detail-emoji').textContent = currentRecipe.emoji || '🍽️';
+  document.getElementById('detail-emoji').style.display = 'flex';
+
+  const heroImg = document.getElementById('detail-hero-img');
+  if (currentRecipe.photos && currentRecipe.photos.length > 0) {
+    heroImg.src = currentRecipe.photos[0].data;
+    heroImg.style.display = 'block';
+    document.getElementById('detail-emoji').style.display = 'none';
+  } else {
+    heroImg.style.display = 'none';
+  }
+
+  updateServingsLabel();
+  document.getElementById('unit-us').classList.toggle('active', currentUnit === 'us');
+  document.getElementById('unit-metric').classList.toggle('active', currentUnit === 'metric');
+  renderIngredients();
+  renderInstructions();
+  renderPhotos();
+
+  // reset tabs
+  switchTab('tab-ingredients', 'recipe-detail-modal');
+  openModal('recipe-detail-modal');
+}
+
+function updateServingsLabel() {
+  document.getElementById('cur-servings').textContent = currentServings;
+  document.getElementById('detail-servings-label').textContent = '👤 ' + currentServings + ' servings';
+}
+
+function adjustServings(delta) {
+  currentServings = Math.max(1, currentServings + delta);
+  updateServingsLabel();
+  renderIngredients();
+}
+
+function setUnit(u) {
+  currentUnit = u;
+  document.getElementById('unit-us').classList.toggle('active', u === 'us');
+  document.getElementById('unit-metric').classList.toggle('active', u === 'metric');
+  renderIngredients();
+}
+
+const unitConversions = {
+  cup: { metric: { unit: 'ml', factor: 240 } },
+  cups: { metric: { unit: 'ml', factor: 240 } },
+  tbsp: { metric: { unit: 'ml', factor: 15 } },
+  tsp: { metric: { unit: 'ml', factor: 5 } },
+  oz: { metric: { unit: 'g', factor: 28.35 } },
+  lb: { metric: { unit: 'g', factor: 453.6 } },
+  lbs: { metric: { unit: 'g', factor: 453.6 } },
+};
+
+function convertAmount(amount, unit) {
+  if (currentUnit === 'us') return { amount, unit };
+  const conv = unitConversions[unit?.toLowerCase()];
+  if (!conv) return { amount, unit };
+  const converted = (amount * conv.metric.factor).toFixed(0);
+  return { amount: parseFloat(converted), unit: conv.metric.unit };
+}
+
+function scaleAmount(amount) {
+  if (!amount || isNaN(amount)) return amount;
+  return Math.round((amount * currentServings / baseServings) * 100) / 100;
+}
+
+function parseIngredient(line) {
+  const match = line.match(/^([\d\/.]+)\s*([a-zA-Z]*)\s+(.+)$/);
+  if (match) {
+    let amt = match[1];
+    if (amt.includes('/')) { const parts = amt.split('/'); amt = parseFloat(parts[0]) / parseFloat(parts[1]); }
+    else { amt = parseFloat(amt); }
+    return { amount: amt, unit: match[2] || '', name: match[3] };
+  }
+  return { amount: null, unit: '', name: line };
+}
+
+function renderIngredients() {
+  if (!currentRecipe) return;
+  const list = document.getElementById('ingredients-list');
+  list.innerHTML = '';
+  (currentRecipe.ingredients || []).forEach((ing, i) => {
+    const parsed = parseIngredient(ing);
+    let scaled = parsed.amount !== null ? scaleAmount(parsed.amount) : null;
+    let displayUnit = parsed.unit;
+    if (scaled !== null && parsed.unit) {
+      const conv = convertAmount(scaled, parsed.unit);
+      scaled = conv.amount; displayUnit = conv.unit;
+    }
+    const displayAmt = scaled !== null ? (scaled + ' ' + displayUnit).trim() : '';
+    const el = document.createElement('div');
+    el.className = 'ingredient-item' + (currentRecipe.checkedIngredients?.includes(i) ? ' checked' : '');
+    el.innerHTML = `
+      <div class="check-box">${currentRecipe.checkedIngredients?.includes(i) ? '<svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>' : ''}</div>
+      <div class="ingredient-name">${parsed.name}</div>
+      ${displayAmt ? `<div class="ingredient-amount">${displayAmt}</div>` : ''}
+    `;
+    el.onclick = () => toggleIngredient(i, el);
+    list.appendChild(el);
+  });
+}
+
+function toggleIngredient(i, el) {
+  if (!currentRecipe.checkedIngredients) currentRecipe.checkedIngredients = [];
+  const idx = currentRecipe.checkedIngredients.indexOf(i);
+  if (idx > -1) currentRecipe.checkedIngredients.splice(idx, 1);
+  else currentRecipe.checkedIngredients.push(i);
+  saveRecipes();
+  renderIngredients();
+}
+
+function clearChecked() {
+  if (currentRecipe) { currentRecipe.checkedIngredients = []; saveRecipes(); renderIngredients(); }
+}
+
+function renderInstructions() {
+  if (!currentRecipe) return;
+  const list = document.getElementById('instructions-list');
+  list.innerHTML = '';
+  (currentRecipe.instructions || []).forEach((step, i) => {
+    const done = currentRecipe.doneSteps?.includes(i);
+    const el = document.createElement('div');
+    el.className = 'step-item' + (done ? ' done' : '');
+    el.innerHTML = `
+      <div class="step-num">${done ? '✓' : i + 1}</div>
+      <div class="step-text">${step}</div>
+    `;
+    el.onclick = () => toggleStep(i);
+    list.appendChild(el);
+  });
+}
+
+function toggleStep(i) {
+  if (!currentRecipe.doneSteps) currentRecipe.doneSteps = [];
+  const idx = currentRecipe.doneSteps.indexOf(i);
+  if (idx > -1) currentRecipe.doneSteps.splice(idx, 1);
+  else currentRecipe.doneSteps.push(i);
+  saveRecipes();
+  renderInstructions();
+}
+
+function clearDone() {
+  if (currentRecipe) { currentRecipe.doneSteps = []; saveRecipes(); renderInstructions(); }
+}
+
+function renderPhotos() {
+  if (!currentRecipe) return;
+  const grid = document.getElementById('photo-grid');
+  grid.innerHTML = '';
+  (currentRecipe.photos || []).forEach((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'photo-thumb';
+    el.innerHTML = `<img src="${p.data}" alt=""><div class="photo-thumb-date">${p.date || ''}</div>`;
+    grid.appendChild(el);
+  });
+}
+
+function triggerPhotoUpload() { document.getElementById('photo-input').click(); }
+
+let photosToProcess = [];
+let processingIndex = 0;
+
+function handlePhotoUpload(input) {
+  photosToProcess = Array.from(input.files);
+  processingIndex = 0;
+  if (photosToProcess.length > 0) promptNextPhoto();
+  input.value = '';
+}
+
+function promptNextPhoto() {
+  if (processingIndex >= photosToProcess.length) return;
+  const file = photosToProcess[processingIndex];
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photo-date-img').src = e.target.result;
+    document.getElementById('photo-date-input').value = new Date().toISOString().split('T')[0];
+    document.getElementById('photo-date-modal').dataset.currentData = e.target.result;
+    openModal('photo-date-modal');
+  };
+  reader.readAsDataURL(file);
+}
+
+function confirmPhotoDate() {
+  const data = document.getElementById('photo-date-modal').dataset.currentData;
+  const date = document.getElementById('photo-date-input').value;
+  if (!currentRecipe.photos) currentRecipe.photos = [];
+  currentRecipe.photos.push({ data, date });
+  saveRecipes();
+  renderPhotos();
+  closeModal('photo-date-modal');
+  processingIndex++;
+  if (processingIndex < photosToProcess.length) promptNextPhoto();
+  else showToast('📷 Photos added!');
+}
+
+// ── Save new recipe ──
+function saveNewRecipe() {
+  if (aiGeneratedRecipe) {
+    saveGeneratedRecipe();
+    return;
+  }
+  const name = document.getElementById('nr-name').value.trim();
+  if (!name) { showToast('Please enter a recipe name'); return; }
+  const ingredText = document.getElementById('nr-ingredients').value;
+  const instrText = document.getElementById('nr-instructions').value;
+  const recipe = {
+    id: Date.now().toString(),
+    name,
+    category: document.getElementById('nr-category').value,
+    time: parseInt(document.getElementById('nr-time').value) || 30,
+    servings: parseInt(document.getElementById('nr-servings').value) || 4,
+    emoji: document.getElementById('nr-emoji').value || '🍽️',
+    ingredients: ingredText.split('\n').map(l => l.trim()).filter(Boolean),
+    instructions: instrText.split('\n').map(l => l.trim()).filter(Boolean),
+    photos: [],
+    checkedIngredients: [],
+    doneSteps: []
+  };
+  recipes.unshift(recipe);
+  saveRecipes();
+  renderRecipes();
+  closeModal('new-recipe-modal');
+  resetNewRecipeForm();
+  showToast('🍽️ Recipe saved!');
+}
+
+function saveGeneratedRecipe() {
+  recipes.unshift(aiGeneratedRecipe);
+  saveRecipes();
+  renderRecipes();
+  closeModal('new-recipe-modal');
+  aiGeneratedRecipe = null;
+  document.getElementById('ai-preview').style.display = 'none';
+  document.getElementById('ai-prompt').value = '';
+  showToast('🍽️ AI Recipe saved!');
+}
+
+function resetNewRecipeForm() {
+  ['nr-name','nr-time','nr-emoji','nr-ingredients','nr-instructions'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('nr-servings').value = '4';
+  aiGeneratedRecipe = null;
+  document.getElementById('ai-preview').style.display = 'none';
+  document.getElementById('ai-prompt').value = '';
+}
+
+// ── Delete recipe ──
+function deleteCurrentRecipe() {
+  if (!currentRecipe) return;
+  if (!confirm('Delete "' + currentRecipe.name + '"?')) return;
+  recipes = recipes.filter(r => r.id !== currentRecipe.id);
+  saveRecipes();
+  renderRecipes();
+  closeModal('recipe-detail-modal');
+  showToast('Recipe deleted');
+}
+
+// ── Share recipe ──
+function shareRecipe() {
+  if (!currentRecipe) return;
+  const text = formatRecipeText(currentRecipe, currentServings);
+  document.getElementById('share-content').textContent = text;
+  openModal('share-modal');
+}
+
+function formatRecipeText(r, servings) {
+  const s = servings || r.servings || 4;
+  const scale = s / (r.servings || 4);
+  let txt = `📖 ${r.name}\n`;
+  txt += '─'.repeat(40) + '\n';
+  txt += `Category: ${r.category || 'Other'} | Time: ${r.time || '?'} min | Servings: ${s}\n\n`;
+  txt += `🧂 INGREDIENTS (${s} servings):\n`;
+  (r.ingredients || []).forEach(ing => {
+    const p = parseIngredient(ing);
+    let amt = p.amount !== null ? Math.round(p.amount * scale * 100) / 100 : null;
+    txt += `  • ${amt !== null ? amt + ' ' + p.unit + ' ' : ''}${p.name}\n`;
+  });
+  txt += '\n📝 INSTRUCTIONS:\n';
+  (r.instructions || []).forEach((step, i) => {
+    txt += `  ${i + 1}. ${step}\n`;
+  });
+  txt += '\n─'.repeat(40) + '\nShared from My Recipe Book 🍴';
+  return txt;
+}
+
+function copyShare() {
+  const text = document.getElementById('share-content').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!')).catch(() => showToast('Copy failed'));
+}
+
+// ── Export / Import ──
+function exportRecipe() {
+  if (!currentRecipe) return;
+  const blob = new Blob([JSON.stringify(currentRecipe, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = currentRecipe.name.replace(/\s+/g, '_') + '.json';
+  a.click();
+  showToast('📤 Recipe exported!');
+}
+
+function importRecipe() { document.getElementById('import-input').click(); }
+
+function handleImport(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const r = JSON.parse(e.target.result);
+      r.id = Date.now().toString(); // new ID
+      if (!r.checkedIngredients) r.checkedIngredients = [];
+      if (!r.doneSteps) r.doneSteps = [];
+      if (!r.photos) r.photos = [];
+      recipes.unshift(r);
+      saveRecipes();
+      renderRecipes();
+      showToast('📥 Recipe imported!');
+    } catch { showToast('Invalid recipe file'); }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// ── AI Recipe Generation ──
+async function generateAIRecipe() {
+  const prompt = document.getElementById('ai-prompt').value.trim();
+  if (!prompt) { showToast('Describe the recipe first'); return; }
+
+  const btn = document.getElementById('ai-generate-btn');
+  const loading = document.getElementById('ai-loading');
+  const preview = document.getElementById('ai-preview');
+
+  btn.style.display = 'none';
+  loading.style.display = 'flex';
+  preview.style.display = 'none';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Generate a recipe based on this request: "${prompt}".
+          
+Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble) in this exact format:
+{
+  "name": "Recipe Name",
+  "category": "Dinner",
+  "time": 30,
+  "servings": 4,
+  "emoji": "🍝",
+  "ingredients": ["2 cups flour", "3 eggs", "1 tsp salt"],
+  "instructions": ["Step one description", "Step two description", "Step three description"]
+}
+
+Categories must be one of: Breakfast, Lunch, Dinner, Snack, Dessert, Drink, Other.
+Emoji should be a single relevant food emoji.
+ingredients: each as a string like "amount unit ingredient name"
+instructions: clear, concise steps`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content.map(b => b.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const recipe = JSON.parse(clean);
+    recipe.id = Date.now().toString();
+    recipe.photos = [];
+    recipe.checkedIngredients = [];
+    recipe.doneSteps = [];
+
+    aiGeneratedRecipe = recipe;
+    document.getElementById('ai-preview-content').textContent = formatRecipeText(recipe, recipe.servings);
+    preview.style.display = 'block';
+
+  } catch (err) {
+    showToast('AI generation failed. Try again.');
+    console.error(err);
+  } finally {
+    btn.style.display = 'inline-flex';
+    loading.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+renderSavedCar();
+renderRecipes();
+
+// Seed a demo recipe if empty
+if (recipes.length === 0) {
+  recipes.push({
+    id: '1',
+    name: 'Classic Spaghetti Carbonara',
+    category: 'Dinner',
+    time: 25,
+    servings: 4,
+    emoji: '🍝',
+    ingredients: ['400g spaghetti','200g pancetta','4 eggs','100g Parmesan cheese','2 cloves garlic','Black pepper to taste','Salt for pasta water'],
+    instructions: [
+      'Bring a large pot of salted water to a boil and cook spaghetti until al dente.',
+      'While pasta cooks, fry pancetta and garlic in a large pan over medium heat until crispy.',
+      'Whisk eggs and grated Parmesan together in a bowl. Season with black pepper.',
+      'Reserve 1 cup of pasta water, then drain pasta.',
+      'Remove pan from heat, add pasta and toss with pancetta.',
+      'Quickly pour in egg mixture, tossing constantly and adding pasta water to create a creamy sauce.',
+      'Serve immediately with extra Parmesan and cracked pepper.'
+    ],
+    photos: [],
+    checkedIngredients: [],
+    doneSteps: []
+  });
+  saveRecipes();
+  renderRecipes();
+}
+</script>
+</body>
+</html>

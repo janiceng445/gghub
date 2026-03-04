@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- CSS Files -->
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/navigation.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/tip-calculator.css">
+<link rel="stylesheet" href="css/gas-calculator.css">
+<link rel="stylesheet" href="css/recipe-book.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="logo"><span class="logo-dot"></span>My Toolkit</div>
+    <button class="nav-btn active" onclick="showPage('tip')" id="nav-tip">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.93V18a1 1 0 0 1-2 0v-1.07A8 8 0 0 1 4.07 11H5a1 1 0 0 1 0 2 6 6 0 0 0 12 0 1 1 0 0 1 2 0 8 8 0 0 1-6 5.93z"/></svg>
+      Tip Calculator
+    </button>
+    <button class="nav-btn" onclick="showPage('gas')" id="nav-gas">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M3 22h14M3 10h14M9 6v4"/><path d="M17 6h2l2 2v4h-4"/></svg>
+      Gas Calculator
+    </button>
+    <button class="nav-btn" onclick="showPage('recipe')" id="nav-recipe">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Recipe Book
+    </button>
+  </nav>
+
+  <!-- Hamburger (mobile) -->
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><span class="logo-dot"></span>My Toolkit</div>
+    <button class="sidebar-btn active" id="sb-tip" onclick="showPage('tip');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+      Tip Calculator
+    </button>
+    <button class="sidebar-btn" id="sb-gas" onclick="showPage('gas');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16M3 22h14M3 10h14"/><path d="M17 6h2l2 2v4h-4"/></svg>
+      Gas Calculator
+    </button>
+    <button class="sidebar-btn" id="sb-recipe" onclick="showPage('recipe');closeSidebar()">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      Recipe Book
+    </button>
+  </div>
+
+  <!-- ════════ TIP CALCULATOR ════════ -->
+  <div class="page active" id="tip-page">
+    <div class="page-header">
+      <div class="accent-line"></div>
+      <h1>Tip Calculator</h1>
+      <p>Split bills fairly — no math stress.</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Bill Details</div>
+      <div class="input-group">
+        <label>Bill Amount ($)</label>
+        <div class="input-wrap">
+          <input type="text" id="bill-amount" placeholder="0.00" inputmode="numeric" oninput="handleCurrencyInput(this)" onfocus="selectAll(this)">
+          <button class="input-clear" onclick="clearField('bill-amount')">✕</button>
+        </div>
+      </div>
+
+      <label>Tip Percentage</label>
+      <div class="pct-pills" id="pct-pills">
+        <div class="pct-pill selected" onclick="selectPct(this,10)">10%</div>
+        <div class="pct-pill" onclick="selectPct(this,15)">15%</div>
+        <div class="pct-pill" onclick="selectPct(this,18)">18%</div>
+        <div class="pct-pill" onclick="selectPct(this,20)">20%</div>
+        <div class="pct-pill" onclick="selectPct(this,25)">25%</div>
+        <div class="pct-pill" id="custom-pill" onclick="toggleCustomField(this)">--</div>
+      </div>
+      <div class="input-group" id="custom-tip-group" style="display:none">
+        <label>Custom Tip %</label>
+        <div class="input-wrap">
+          <input type="text" id="custom-tip" placeholder="e.g. 22" inputmode="numeric" oninput="handleCustomTip(this)" onfocus="selectAll(this)">
+          <button class="input-clear" onclick="clearField('custom-tip')">✕</button>
+        </div>
+      </div>
+
+      <div class="tip-result" id="tip-result">
+        <div class="tip-result-grid" style="grid-template-columns:1fr 1fr">
+          <div class="tip-stat">
+            <div class="tip-stat-val" id="res-tip-amt">$0.00</div>
+            <div class="tip-stat-lbl">Tip Amount</div>
+          </div>
+          <div class="tip-stat">
+            <div class="tip-stat-val" id="res-total">$0.00</div>
+            <div class="tip-stat-lbl">Total Bill</div>
+          </div>
+        </div>
+
+        <hr class="round-divider">
+        <div class="round-grid">
+          <div class="round-box">
+            <div class="round-box-header">
+              <span class="round-box-title">Round Down</span>
+              <span class="round-box-badge badge-down" id="rd-badge">▼ −$0.00</span>
+            </div>
+            <div class="round-total" id="rd-total">$0.00</div>
+            <div class="round-meta">
+              <div class="round-meta-item">Actual tip: <span id="rd-tip-pct">0%</span></div>
+              <div class="round-meta-item">Tip amount: <span id="rd-tip-amt">$0.00</span></div>
+            </div>
+          </div>
+          <div class="round-box">
+            <div class="round-box-header">
+              <span class="round-box-title">Round Up</span>
+              <span class="round-box-badge badge-up" id="ru-badge">▲ +$0.00</span>
+            </div>
+            <div class="round-total" id="ru-total">$0.00</div>
+            <div class="round-meta">
+              <div class="round-meta-item">Actual tip: <span id="ru-tip-pct">0%</span></div>
+              <div class="round-meta-item">Tip amount: <span id="ru-tip-amt">$0.00</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ GAS CALCULATOR ════════ -->
+  <div class="page" id="gas-page">
+    <div class="page-header">
+      <div class="accent-line" style="background:var(--accent2)"></div>
+      <h1>Gas Calculator</h1>
+      <p>Know exactly how much that fill-up will cost.</p>
+    </div>
+
+    <div class="card" id="saved-car-card" style="display:none">
+      <div class="card-title">My Garage</div>
+      <div id="saved-car-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Vehicle & Fuel Details</div>
+
+      <div class="gas-vehicle-row">
+        <div class="input-group" style="flex:1;margin-bottom:0">
+          <label>Car Make</label>
+          <select id="car-make" onchange="populateModels()">
+            <option value="">Select Make</option>
+            <option>Acura</option><option>Toyota</option><option>Honda</option><option>Ford</option>
+            <option>Chevrolet</option><option>BMW</option><option>Mercedes-Benz</option>
+            <option>Volkswagen</option><option>Hyundai</option><option>Kia</option>
+            <option>Nissan</option><option>Subaru</option><option>Mazda</option>
+            <option>Audi</option><option>Lexus</option><option>Ram</option>
+            <option>GMC</option><option>Jeep</option><option>Tesla</option>
+            <option>Dodge</option><option>Chrysler</option><option>Other</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;margin-bottom:0">
+          <label>Model</label>
+          <select id="car-model" onchange="autoFillTank()"><option value="">—</option></select>
+        </div>
+        <div style="padding-top:22px;flex-shrink:0">
+          <button class="gas-save-btn" onclick="saveCar()" title="Save vehicle">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="input-row" style="margin-top:14px">
+        <div class="input-group">
+          <label>Gas Leftover (%)</label>
+          <div class="input-wrap">
+            <input type="text" id="tank-level" placeholder="e.g. 25" inputmode="numeric" oninput="handleLevelInput(this)">
+            <button class="input-clear" onclick="clearField('tank-level')">✕</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Gas Price ($/gal)</label>
+          <div class="input-wrap">
+            <input type="text" id="gas-price" placeholder="e.g. 3.45" inputmode="decimal" oninput="calcGas()">
+            <button class="input-clear" onclick="clearField('gas-price')">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gas-result" id="gas-result">
+        <div class="gas-primary">
+          <div class="gas-primary-label">Pay approximately</div>
+          <div class="gas-primary-val" id="res-rounded-cost">$0.00</div>
+          <div class="gas-primary-sub">rounded to nearest dollar</div>
+        </div>
+        <div class="gas-details-table">
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Tank Size</span>
+            <span class="gas-detail-val" id="res-tank-size">—</span>
+          </div>
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Gal. Needed</span>
+            <span class="gas-detail-val" id="res-gallons">—</span>
+          </div>
+          <div class="gas-detail-row">
+            <span class="gas-detail-key">Exact Cost</span>
+            <span class="gas-detail-val" id="res-fill-cost">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ RECIPE BOOK ════════ -->
+  <div class="page" id="recipe-page">
+    <div class="page-header">
+      <div class="accent-line" style="background:var(--accent3)"></div>
+      <h1>Recipe Book</h1>
+      <p>Your kitchen, your collection.</p>
+    </div>
+
+    <div class="top-toolbar">
+      <div class="search-wrap">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search recipes…" id="recipe-search" oninput="renderRecipes()">
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openModal('new-recipe-modal')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        New
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="importRecipe()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Import
+      </button>
+    </div>
+
+    <div class="recipe-grid" id="recipe-grid"></div>
+    <div class="empty-state" id="recipe-empty" style="display:none">
+      <div class="icon">🍳</div>
+      <p>No recipes yet. Add your first one!</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════ RECIPE DETAIL MODAL ════ -->
+<div class="modal-overlay" id="recipe-detail-modal">
+  <div class="modal" style="max-width:720px">
+    <div class="recipe-detail-header" id="detail-hero" style="min-height:180px">
+      <div class="recipe-detail-img-placeholder" id="detail-emoji">🍽️</div>
+      <img id="detail-hero-img" src="" alt="" style="display:none" class="recipe-detail-img">
+      <div class="recipe-detail-info">
+        <h2 id="detail-title">Recipe Title</h2>
+        <div class="recipe-detail-meta">
+          <span id="detail-time">⏱ 30 min</span>
+          <span id="detail-servings-label">👤 4 servings</span>
+          <span id="detail-category">🏷 Dinner</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 24px;border-bottom:1px solid var(--border)">
+      <div class="serving-ctrl" style="margin:0">
+        <label style="margin:0;font-size:0.82rem">Servings:</label>
+        <div class="serving-num">
+          <button class="serving-btn" onclick="adjustServings(-1)">−</button>
+          <span class="serving-val" id="cur-servings">4</span>
+          <button class="serving-btn" onclick="adjustServings(1)">+</button>
+        </div>
+      </div>
+      <div class="unit-toggle" style="margin:0">
+        <button class="unit-btn active" id="unit-us" onclick="setUnit('us')">US</button>
+        <button class="unit-btn" id="unit-metric" onclick="setUnit('metric')">Metric</button>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-ghost" onclick="shareRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-sm btn-success" onclick="exportRecipe()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCurrentRecipe()">Delete</button>
+      </div>
+    </div>
+
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('tab-ingredients','recipe-detail-modal')">Ingredients</button>
+      <button class="modal-tab" onclick="switchTab('tab-instructions','recipe-detail-modal')">Instructions</button>
+      <button class="modal-tab" onclick="switchTab('tab-photos','recipe-detail-modal')">Photos</button>
+    </div>
+
+    <div class="modal-body" style="max-height:50vh;overflow-y:auto">
+      <div class="tab-pane active" id="tab-ingredients">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-sm btn-ghost" onclick="clearChecked()">Clear Checks</button>
+        </div>
+        <div id="ingredients-list"></div>
+      </div>
+      <div class="tab-pane" id="tab-instructions">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+          <button class="btn btn-sm btn-ghost" onclick="clearDone()">Reset Steps</button>
+        </div>
+        <div id="instructions-list"></div>
+      </div>
+      <div class="tab-pane" id="tab-photos">
+        <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center">
+          <button class="btn btn-sm btn-primary" onclick="triggerPhotoUpload()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Add Photos
+          </button>
+          <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(this)">
+        </div>
+        <div class="photo-grid" id="photo-grid"></div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('recipe-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ NEW RECIPE MODAL ════ -->
+<div class="modal-overlay" id="new-recipe-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>✨ New Recipe</h2>
+      <button class="modal-close" onclick="closeModal('new-recipe-modal')">✕</button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('nr-manual','new-recipe-modal')">Manual</button>
+      <button class="modal-tab" onclick="switchTab('nr-ai','new-recipe-modal')">AI Generate</button>
+    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto">
+
+      <div class="tab-pane active" id="nr-manual">
+        <div class="input-group">
+          <label>Recipe Name *</label>
+          <input type="text" id="nr-name" placeholder="e.g. Grandma's Lasagna">
+        </div>
+        <div class="input-row">
+          <div class="input-group">
+            <label>Category</label>
+            <select id="nr-category">
+              <option>Breakfast</option><option>Lunch</option><option selected>Dinner</option>
+              <option>Snack</option><option>Dessert</option><option>Drink</option><option>Other</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Cook Time (min)</label>
+            <input type="number" id="nr-time" placeholder="30" min="1">
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Base Servings</label>
+          <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
+        </div>
+        <div class="input-group">
+          <label>Emoji (optional)</label>
+          <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
+        </div>
+        <hr class="divider">
+        <div class="input-group">
+          <label>Ingredients (one per line: "1 cup flour" or "2 eggs")</label>
+          <textarea id="nr-ingredients" placeholder="2 cups flour&#10;3 eggs&#10;1 cup milk&#10;2 tbsp butter"></textarea>
+        </div>
+        <div class="input-group">
+          <label>Instructions (one step per line)</label>
+          <textarea id="nr-instructions" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients and stir&#10;Bake for 25-30 minutes"></textarea>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="nr-ai">
+        <div style="margin-bottom:14px;padding:14px;background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);border-radius:var(--radius-sm)">
+          <p style="font-size:0.85rem;color:var(--text2)">✨ Describe what you want and AI will generate a complete recipe for you.</p>
+        </div>
+        <div class="input-group">
+          <label>What would you like to make?</label>
+          <textarea id="ai-prompt" placeholder="e.g. A creamy pasta with spinach and sun-dried tomatoes, vegetarian, serves 4, under 30 minutes" style="min-height:80px"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="generateAIRecipe()" id="ai-generate-btn">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Generate Recipe
+        </button>
+        <div id="ai-loading" style="display:none" class="ai-generating">
+          <div class="spinner"></div> AI is crafting your recipe…
+        </div>
+        <div id="ai-preview" style="display:none;margin-top:16px">
+          <p style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;font-weight:600">✅ Recipe generated! Review and save:</p>
+          <div id="ai-preview-content" class="share-output" style="max-height:200px"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('new-recipe-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewRecipe()" id="save-recipe-btn">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SHARE MODAL ════ -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <h2>📤 Share Recipe</h2>
+      <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem;color:var(--text2);margin-bottom:14px">Copy this formatted recipe to share with anyone.</p>
+      <div class="share-output" id="share-content"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('share-modal')">Close</button>
+      <button class="btn btn-primary" onclick="copyShare()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy to Clipboard
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PHOTO DATE MODAL ════ -->
+<div class="modal-overlay" id="photo-date-modal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <h2>📷 Add Photo Date</h2>
+      <button class="modal-close" onclick="closeModal('photo-date-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="photo-date-preview" style="width:100%;height:160px;border-radius:10px;background:var(--surface2);overflow:hidden;margin-bottom:14px;display:flex;align-items:center;justify-content:center">
+        <img id="photo-date-img" src="" style="max-width:100%;max-height:100%;object-fit:cover;border-radius:10px">
+      </div>
+      <div class="input-group">
+        <label>Date Taken</label>
+        <input type="date" id="photo-date-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('photo-date-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmPhotoDate()">Add Photo</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
+
+<!-- JavaScript Files -->
+<script src="js/main.js"></script>
+<script src="js/tip-calculator.js"></script>
+<script src="js/gas-calculator.js"></script>
+<script src="js/recipe-book.js"></script>
+
+<!-- Initialize -->
+<script>
+  renderSavedCar();
+  initRecipes();
+</script>
+
+</body>
+</html>
