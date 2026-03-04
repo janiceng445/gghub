@@ -3,8 +3,6 @@
 // ══════════════════════════════════════════════
 
 function showPage(name) {
-  window.scrollTo(0, 64); // Scroll past sticky nav (--nav-h: 64px) to show page header
-  
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(b => b.classList.remove('active'));
   document.getElementById(name + '-page').classList.add('active');
