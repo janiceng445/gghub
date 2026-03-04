@@ -9,6 +9,10 @@ let baseServings = 4;
 let currentUnit = 'us';
 let aiGeneratedRecipe = null;
 
+// Photo management
+let photoMultiSelectMode = false;
+let selectedPhotos = new Set();
+
 function saveRecipes() { 
   localStorage.setItem('recipes', JSON.stringify(recipes)); 
 }
@@ -35,7 +39,7 @@ function renderRecipes() {
     el.onclick = () => openRecipe(r.id);
     
     const imgHtml = r.photos && r.photos.length > 0
-      ? `<img src="${r.photos[0].data}" alt="">`
+      ? `<img src="${r.photos[r.photos.length - 1].data}" alt="">`
       : (r.emoji || '🍽️');
     
     el.innerHTML = `
@@ -57,6 +61,8 @@ function openRecipe(id) {
   currentRecipe = recipes.find(r => r.id === id);
   if (!currentRecipe) return;
   
+  photoMultiSelectMode = false;
+  selectedPhotos.clear();
   baseServings = currentRecipe.servings || 4;
   currentServings = baseServings;
   currentUnit = 'us';
@@ -69,7 +75,7 @@ function openRecipe(id) {
 
   const heroImg = document.getElementById('detail-hero-img');
   if (currentRecipe.photos && currentRecipe.photos.length > 0) {
-    heroImg.src = currentRecipe.photos[0].data;
+    heroImg.src = currentRecipe.photos[currentRecipe.photos.length - 1].data;
     heroImg.style.display = 'block';
     document.getElementById('detail-emoji').style.display = 'none';
   } else {
@@ -142,6 +148,10 @@ function parseIngredient(line) {
   return { amount: null, unit: '', name: line };
 }
 
+function capitalizeFirstWord(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function renderIngredients() {
   if (!currentRecipe) return;
   const list = document.getElementById('ingredients-list');
@@ -159,12 +169,13 @@ function renderIngredients() {
     }
     
     const displayAmt = scaled !== null ? (scaled + ' ' + displayUnit).trim() : '';
+    const ingredientName = capitalizeFirstWord(parsed.name);
     const el = document.createElement('div');
     el.className = 'ingredient-item' + (currentRecipe.checkedIngredients?.includes(i) ? ' checked' : '');
     el.innerHTML = `
       <div class="check-box">${currentRecipe.checkedIngredients?.includes(i) ? '<svg width="12" height="12" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>' : ''}</div>
-      <div class="ingredient-name">${parsed.name}</div>
       ${displayAmt ? `<div class="ingredient-amount">${displayAmt}</div>` : ''}
+      <div class="ingredient-name">${ingredientName}</div>
     `;
     el.onclick = () => toggleIngredient(i, el);
     list.appendChild(el);
@@ -188,6 +199,10 @@ function clearChecked() {
   }
 }
 
+function toSentenceCase(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 function renderInstructions() {
   if (!currentRecipe) return;
   const list = document.getElementById('instructions-list');
@@ -195,11 +210,12 @@ function renderInstructions() {
   
   (currentRecipe.instructions || []).forEach((step, i) => {
     const done = currentRecipe.doneSteps?.includes(i);
+    const sentenceCaseStep = toSentenceCase(step);
     const el = document.createElement('div');
     el.className = 'step-item' + (done ? ' done' : '');
     el.innerHTML = `
       <div class="step-num">${done ? '✓' : i + 1}</div>
-      <div class="step-text">${step}</div>
+      <div class="step-text">${sentenceCaseStep}</div>
     `;
     el.onclick = () => toggleStep(i);
     list.appendChild(el);
@@ -226,14 +242,103 @@ function clearDone() {
 function renderPhotos() {
   if (!currentRecipe) return;
   const grid = document.getElementById('photo-grid');
+  const deleteBtn = document.getElementById('delete-selected-btn');
   grid.innerHTML = '';
+  
+  // Show/hide delete button based on selection
+  deleteBtn.style.display = selectedPhotos.size > 0 ? 'inline-flex' : 'none';
   
   (currentRecipe.photos || []).forEach((p, i) => {
     const el = document.createElement('div');
     el.className = 'photo-thumb';
-    el.innerHTML = `<img src="${p.data}" alt=""><div class="photo-thumb-date">${p.date || ''}</div>`;
+    const isSelected = selectedPhotos.has(i);
+    if (isSelected) el.classList.add('photo-thumb-selected');
+    
+    el.innerHTML = `
+      <img src="${p.data}" alt="">
+      <div class="photo-thumb-date">${p.date || ''}</div>
+      <button class="photo-thumb-delete" title="Delete photo">✕</button>
+      ${photoMultiSelectMode ? `<div class="photo-thumb-checkbox"></div>` : ''}
+    `;
+    
+    const deleteBtn = el.querySelector('.photo-thumb-delete');
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (photoMultiSelectMode) {
+        togglePhotoSelection(i);
+      } else {
+        deletePhoto(i);
+      }
+    };
+    
+    el.onmousedown = (e) => {
+      if (photoMultiSelectMode) {
+        togglePhotoSelection(i);
+      } else if (e.button === 0) {
+        startLongPress(e, i);
+      }
+    };
+    
+    el.onmouseup = cancelLongPress;
+    el.onmouseleave = cancelLongPress;
+    el.ontouchstart = (e) => startLongPress(e, i);
+    el.ontouchend = cancelLongPress;
+    
     grid.appendChild(el);
   });
+}
+
+let longPressTimer = null;
+function startLongPress(e, photoIndex) {
+  longPressTimer = setTimeout(() => {
+    if (!photoMultiSelectMode) {
+      photoMultiSelectMode = true;
+      selectedPhotos.clear();
+      togglePhotoSelection(photoIndex);
+      renderPhotos();
+      showToast('📸 Multi-select mode');
+    }
+  }, 500);
+}
+
+function cancelLongPress() {
+  if (longPressTimer) clearTimeout(longPressTimer);
+}
+
+function togglePhotoSelection(i) {
+  if (selectedPhotos.has(i)) {
+    selectedPhotos.delete(i);
+  } else {
+    selectedPhotos.add(i);
+  }
+  if (selectedPhotos.size === 0) {
+    photoMultiSelectMode = false;
+  }
+  renderPhotos();
+}
+
+function deletePhoto(i) {
+  if (!confirm('Delete this photo?')) return;
+  currentRecipe.photos.splice(i, 1);
+  saveRecipes();
+  renderPhotos();
+  renderRecipes();
+  showToast('📸 Photo deleted');
+}
+
+function deleteSelectedPhotos() {
+  if (selectedPhotos.size === 0) return;
+  if (!confirm(`Delete ${selectedPhotos.size} photo(s)?`)) return;
+  
+  const indices = Array.from(selectedPhotos).sort((a, b) => b - a);
+  indices.forEach(i => currentRecipe.photos.splice(i, 1));
+  
+  selectedPhotos.clear();
+  photoMultiSelectMode = false;
+  saveRecipes();
+  renderPhotos();
+  renderRecipes();
+  showToast(`📸 ${indices.length} photo(s) deleted`);
 }
 
 function triggerPhotoUpload() { 
@@ -278,57 +383,67 @@ function confirmPhotoDate() {
   else showToast('📷 Photos added!');
 }
 
-function saveNewRecipe() {
-  if (aiGeneratedRecipe) {
-    saveGeneratedRecipe();
-    return;
+function populateEditForm(recipe) {
+  document.getElementById('edit-recipe-name').value = recipe.name || '';
+  document.getElementById('edit-recipe-category').value = recipe.category || 'Other';
+  document.getElementById('edit-recipe-time').value = recipe.time || '';
+  document.getElementById('edit-recipe-servings').value = recipe.servings || '4';
+  document.getElementById('edit-recipe-ingredients').value = (recipe.ingredients || []).join('\n');
+  document.getElementById('edit-recipe-instructions').value = (recipe.instructions || []).join('\n');
+}
+
+function readEditForm() {
+  const name = document.getElementById('edit-recipe-name').value.trim();
+  const category = document.getElementById('edit-recipe-category').value;
+  const time = parseInt(document.getElementById('edit-recipe-time').value) || 0;
+  const servings = parseInt(document.getElementById('edit-recipe-servings').value) || 4;
+  const ingredients = document.getElementById('edit-recipe-ingredients').value.trim().split('\n').filter(l => l.trim());
+  const instructions = document.getElementById('edit-recipe-instructions').value.trim().split('\n').filter(l => l.trim());
+  
+  if (!name || !ingredients.length || !instructions.length) {
+    showToast('Fill in name, ingredients, and instructions');
+    return null;
   }
   
-  const name = document.getElementById('nr-name').value.trim();
-  if (!name) { showToast('Please enter a recipe name'); return; }
-  
-  const ingredText = document.getElementById('nr-ingredients').value;
-  const instrText = document.getElementById('nr-instructions').value;
-  
-  const recipe = {
+  return {
     id: Date.now().toString(),
     name,
-    category: document.getElementById('nr-category').value,
-    time: parseInt(document.getElementById('nr-time').value) || 30,
-    servings: parseInt(document.getElementById('nr-servings').value) || 4,
-    emoji: document.getElementById('nr-emoji').value || '🍽️',
-    ingredients: ingredText.split('\n').map(l => l.trim()).filter(Boolean),
-    instructions: instrText.split('\n').map(l => l.trim()).filter(Boolean),
+    category,
+    time,
+    servings,
+    emoji: aiGeneratedRecipe?.emoji || '🍽️',
+    ingredients,
+    instructions,
     photos: [],
     checkedIngredients: [],
     doneSteps: []
   };
+}
+
+function saveNewRecipe() {
+  const recipe = readEditForm();
+  if (!recipe) return;
   
   recipes.unshift(recipe);
   saveRecipes();
   renderRecipes();
   closeModal('new-recipe-modal');
+  aiGeneratedRecipe = null;
+  document.getElementById('paste-preview').style.display = 'none';
   resetNewRecipeForm();
   showToast('🍽️ Recipe saved!');
 }
 
-function saveGeneratedRecipe() {
-  recipes.unshift(aiGeneratedRecipe);
-  saveRecipes();
-  renderRecipes();
-  closeModal('new-recipe-modal');
-  aiGeneratedRecipe = null;
-  document.getElementById('ai-preview').style.display = 'none';
-  document.getElementById('ai-prompt').value = '';
-  showToast('🍽️ AI Recipe saved!');
-}
-
 function resetNewRecipeForm() {
-  ['nr-name','nr-time','nr-emoji','nr-ingredients','nr-instructions'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('nr-servings').value = '4';
+  document.getElementById('paste-recipe-text').value = '';
+  document.getElementById('edit-recipe-name').value = '';
+  document.getElementById('edit-recipe-category').value = 'Other';
+  document.getElementById('edit-recipe-time').value = '';
+  document.getElementById('edit-recipe-servings').value = '4';
+  document.getElementById('edit-recipe-ingredients').value = '';
+  document.getElementById('edit-recipe-instructions').value = '';
   aiGeneratedRecipe = null;
-  document.getElementById('ai-preview').style.display = 'none';
-  document.getElementById('ai-prompt').value = '';
+  document.getElementById('paste-preview').style.display = 'none';
 }
 
 function deleteCurrentRecipe() {
@@ -345,7 +460,48 @@ function shareRecipe() {
   if (!currentRecipe) return;
   const text = formatRecipeText(currentRecipe, currentServings);
   document.getElementById('share-content').textContent = text;
+  document.getElementById('share-modal-title').textContent = '📤 Share Recipe';
   openModal('share-modal');
+}
+
+function shareIngredients() {
+  if (!currentRecipe) return;
+  let text = `🧂 Ingredients for ${currentRecipe.name}\n`;
+  text += `${currentServings} servings (1x serving size from recipe)\n`;
+  text += '─'.repeat(40) + '\n\n';
+  
+  (currentRecipe.ingredients || []).forEach(ing => {
+    const parsed = parseIngredient(ing);
+    let scaled = parsed.amount !== null ? scaleAmount(parsed.amount) : null;
+    let displayUnit = parsed.unit;
+    
+    if (scaled !== null && parsed.unit) {
+      const conv = convertAmount(scaled, parsed.unit);
+      scaled = conv.amount;
+      displayUnit = conv.unit;
+    }
+    
+    const display = scaled !== null ? `${scaled} ${displayUnit}` : '';
+    text += `• ${display ? display + ' ' : ''}${parsed.name}\n`;
+  });
+  
+  document.getElementById('share-content').textContent = text;
+  document.getElementById('share-modal-title').textContent = '🧂 Ingredient List';
+  openModal('share-modal');
+}
+
+function formatRecipePreview(r) {
+  let txt = `📖 ${r.name}\n`;
+  txt += `🏷 ${r.category || 'Other'} | ⏱ ${r.time || '?'} min | 👤 ${r.servings || 4}\n\n`;
+  txt += `🧂 INGREDIENTS:\n`;
+  (r.ingredients || []).forEach(ing => {
+    txt += `  • ${ing}\n`;
+  });
+  txt += `\n📝 INSTRUCTIONS:\n`;
+  (r.instructions || []).forEach((step, i) => {
+    txt += `  ${i + 1}. ${step}\n`;
+  });
+  return txt;
 }
 
 function formatRecipeText(r, servings) {
@@ -411,8 +567,23 @@ function handleImport(input) {
 }
 
 async function generateAIRecipe() {
-  const prompt = document.getElementById('ai-prompt').value.trim();
-  if (!prompt) { showToast('Describe the recipe first'); return; }
+  const name = document.getElementById('ai-name').value.trim();
+  const servings = document.getElementById('ai-servings').value || '4';
+  const ingredText = document.getElementById('ai-ingredients').value.trim();
+  const instrText = document.getElementById('ai-instructions').value.trim();
+  
+  if (!name || !ingredText || !instrText) { 
+    showToast('Fill in all 4 fields'); 
+    return; 
+  }
+
+  let apiKey = localStorage.getItem('geminiApiKey');
+  if (!apiKey) {
+    apiKey = prompt('Enter your Google Gemini API key (free from https://aistudio.google.com/apikey):\n\nThis will be stored locally on your device.');
+    if (!apiKey) return;
+    localStorage.setItem('geminiApiKey', apiKey);
+    showToast('API key saved locally');
+  }
 
   const btn = document.getElementById('ai-generate-btn');
   const loading = document.getElementById('ai-loading');
@@ -423,37 +594,65 @@ async function generateAIRecipe() {
   preview.style.display = 'none';
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Get list of available models
+    const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    if (!modelsRes.ok) throw new Error('Failed to fetch available models');
+    
+    const modelsData = await modelsRes.json();
+    const textModel = modelsData.models?.find(m => 
+      m.supportedGenerationMethods?.includes('generateContent')
+    );
+    
+    if (!textModel) throw new Error('No text generation model available');
+    
+    const modelName = textModel.name.replace('models/', '');
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: `Generate a recipe based on this request: "${prompt}".
-          
+        contents: [{
+          parts: [{
+            text: `Parse and format this recipe for consistency:
+
+Recipe Name: ${name}
+Servings: ${servings}
+
+Ingredients (user provided):
+${ingredText}
+
+Instructions (user provided):
+${instrText}
+
 Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble) in this exact format:
 {
   "name": "Recipe Name",
   "category": "Dinner",
   "time": 30,
-  "servings": 4,
-  "emoji": "🍝",
-  "ingredients": ["2 cups flour", "3 eggs", "1 tsp salt"],
-  "instructions": ["Step one description", "Step two description", "Step three description"]
+  "servings": ${servings},
+  "emoji": "🍽️",
+  "ingredients": ["amount unit ingredient name", "amount ingredient name"],
+  "instructions": ["Clear first step", "Clear second step"]
 }
 
-Categories must be one of: Breakfast, Lunch, Dinner, Snack, Dessert, Drink, Other.
-Emoji should be a single relevant food emoji.
-ingredients: each as a string like "amount unit ingredient name"
-instructions: clear, concise steps`
+Requirements:
+- Keep ingredients in format: "amount unit name" (e.g. "2 cups flour")
+- Category must be one of: Breakfast, Lunch, Dinner, Snack, Dessert, Drink, Other
+- Time: estimate reasonable cook time in minutes
+- Emoji: pick ONE relevant food emoji
+- ingredients: standardize quantities but maintain user's amounts
+- instructions: keep concise, one action per step`
+          }]
         }]
       })
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+    }
+
     const data = await response.json();
-    const text = data.content.map(b => b.text || '').join('');
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const recipe = JSON.parse(clean);
     recipe.id = Date.now().toString();
@@ -462,11 +661,108 @@ instructions: clear, concise steps`
     recipe.doneSteps = [];
 
     aiGeneratedRecipe = recipe;
-    document.getElementById('ai-preview-content').textContent = formatRecipeText(recipe, recipe.servings);
+    document.getElementById('ai-preview-content').textContent = formatRecipePreview(recipe);
     preview.style.display = 'block';
 
   } catch (err) {
-    showToast('AI generation failed. Try again.');
+    showToast('Parsing failed: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.style.display = 'inline-flex';
+    loading.style.display = 'none';
+  }
+}
+
+async function parseRecipeFromText() {
+  const text = document.getElementById('paste-recipe-text').value.trim();
+  if (!text) { 
+    showToast('Paste recipe text first'); 
+    return; 
+  }
+
+  let apiKey = localStorage.getItem('geminiApiKey');
+  if (!apiKey) {
+    apiKey = prompt('Enter your Google Gemini API key (free from https://aistudio.google.com/apikey):\n\nThis will be stored locally on your device.');
+    if (!apiKey) return;
+    localStorage.setItem('geminiApiKey', apiKey);
+    showToast('API key saved locally');
+  }
+
+  const btn = document.getElementById('paste-parse-btn');
+  const loading = document.getElementById('paste-loading');
+  const preview = document.getElementById('paste-preview');
+
+  btn.style.display = 'none';
+  loading.style.display = 'flex';
+  preview.style.display = 'none';
+
+  try {
+    // Get list of available models and find one that supports generateContent
+    const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    if (!modelsRes.ok) throw new Error('Failed to fetch available models');
+    
+    const modelsData = await modelsRes.json();
+    const textModel = modelsData.models?.find(m => 
+      m.supportedGenerationMethods?.includes('generateContent')
+    );
+    
+    if (!textModel) throw new Error('No text generation model available');
+    
+    const modelName = textModel.name.replace('models/', '');
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: `Extract and intelligently parse this recipe text into a structured format:
+
+${text}
+
+Respond ONLY with a valid JSON object (no markdown, no backticks, no preamble) in this exact format:
+{
+  "name": "Recipe Name",
+  "category": "Dinner",
+  "time": 30,
+  "servings": 4,
+  "emoji": "🍽️",
+  "ingredients": ["amount unit ingredient", "ingredient without amount"],
+  "instructions": ["Step one", "Step two", "Step three"]
+}
+
+Requirements:
+- Extract recipe name from text (if not obvious, use best guess from content)
+- Extract or estimate servings (default to 4 if not found)
+- ingredients: standardize format as "amount unit ingredient" or just "ingredient"
+- instructions: break into clear, numbered steps (no step numbers in text)
+- category: one of Breakfast, Lunch, Dinner, Snack, Dessert, Drink, Other
+- time: estimate in minutes (15-60 typical range)
+- emoji: pick ONE relevant food emoji that best represents the dish`
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = responseText.replace(/```json|```/g, '').trim();
+    const recipe = JSON.parse(clean);
+    recipe.id = Date.now().toString();
+    recipe.photos = [];
+    recipe.checkedIngredients = [];
+    recipe.doneSteps = [];
+
+    aiGeneratedRecipe = recipe;
+    populateEditForm(recipe);
+    document.getElementById('paste-preview').style.display = 'block';
+
+  } catch (err) {
+    showToast('Parse failed: ' + err.message);
     console.error(err);
   } finally {
     btn.style.display = 'inline-flex';

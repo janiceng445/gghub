@@ -286,6 +286,10 @@
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
           Share
         </button>
+        <button class="btn btn-sm btn-ghost" onclick="shareIngredients()">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share List
+        </button>
         <button class="btn btn-sm btn-success" onclick="exportRecipe()">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Export
@@ -319,6 +323,10 @@
             <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             Add Photos
           </button>
+          <button class="btn btn-sm btn-danger" id="delete-selected-btn" style="display:none" onclick="deleteSelectedPhotos()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+            Delete Selected
+          </button>
           <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotoUpload(this)">
         </div>
         <div class="photo-grid" id="photo-grid"></div>
@@ -339,66 +347,66 @@
       <button class="modal-close" onclick="closeModal('new-recipe-modal')">✕</button>
     </div>
     <div class="modal-tabs">
-      <button class="modal-tab active" onclick="switchTab('nr-manual','new-recipe-modal')">Manual</button>
-      <button class="modal-tab" onclick="switchTab('nr-ai','new-recipe-modal')">AI Generate</button>
+      <button class="modal-tab active" onclick="switchTab('nr-paste','new-recipe-modal')">Paste Recipe</button>
     </div>
     <div class="modal-body" style="max-height:70vh;overflow-y:auto">
 
-      <div class="tab-pane active" id="nr-manual">
-        <div class="input-group">
-          <label>Recipe Name *</label>
-          <input type="text" id="nr-name" placeholder="e.g. Grandma's Lasagna">
-        </div>
-        <div class="input-row">
-          <div class="input-group">
-            <label>Category</label>
-            <select id="nr-category">
-              <option>Breakfast</option><option>Lunch</option><option selected>Dinner</option>
-              <option>Snack</option><option>Dessert</option><option>Drink</option><option>Other</option>
-            </select>
-          </div>
-          <div class="input-group">
-            <label>Cook Time (min)</label>
-            <input type="number" id="nr-time" placeholder="30" min="1">
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Base Servings</label>
-          <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
-        </div>
-        <div class="input-group">
-          <label>Emoji (optional)</label>
-          <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
-        </div>
-        <hr class="divider">
-        <div class="input-group">
-          <label>Ingredients (one per line: "1 cup flour" or "2 eggs")</label>
-          <textarea id="nr-ingredients" placeholder="2 cups flour&#10;3 eggs&#10;1 cup milk&#10;2 tbsp butter"></textarea>
-        </div>
-        <div class="input-group">
-          <label>Instructions (one step per line)</label>
-          <textarea id="nr-instructions" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients and stir&#10;Bake for 25-30 minutes"></textarea>
-        </div>
-      </div>
-
-      <div class="tab-pane" id="nr-ai">
+      <div class="tab-pane active" id="nr-paste">
         <div style="margin-bottom:14px;padding:14px;background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);border-radius:var(--radius-sm)">
-          <p style="font-size:0.85rem;color:var(--text2)">✨ Describe what you want and AI will generate a complete recipe for you.</p>
+          <p style="font-size:0.85rem;color:var(--text2)">📋 Paste any recipe text and AI will intelligently extract and format it.</p>
         </div>
         <div class="input-group">
-          <label>What would you like to make?</label>
-          <textarea id="ai-prompt" placeholder="e.g. A creamy pasta with spinach and sun-dried tomatoes, vegetarian, serves 4, under 30 minutes" style="min-height:80px"></textarea>
+          <label>Paste Recipe Text</label>
+          <textarea id="paste-recipe-text" placeholder="Paste any recipe from a website, blog, or document..." style="min-height:150px"></textarea>
         </div>
-        <button class="btn btn-primary" onclick="generateAIRecipe()" id="ai-generate-btn">
+        <button class="btn btn-primary" onclick="parseRecipeFromText()" id="paste-parse-btn">
           <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Generate Recipe
+          Parse with AI
         </button>
-        <div id="ai-loading" style="display:none" class="ai-generating">
-          <div class="spinner"></div> AI is crafting your recipe…
+        <div id="paste-loading" style="display:none" class="ai-generating">
+          <div class="spinner"></div> AI is extracting recipe details…
         </div>
-        <div id="ai-preview" style="display:none;margin-top:16px">
-          <p style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;font-weight:600">✅ Recipe generated! Review and save:</p>
-          <div id="ai-preview-content" class="share-output" style="max-height:200px"></div>
+        <div id="paste-preview" style="display:none;margin-top:16px">
+          <p style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;font-weight:600">✅ Recipe extracted! Edit if needed:</p>
+          
+          <div class="input-group">
+            <label>Recipe Name</label>
+            <input type="text" id="edit-recipe-name" placeholder="e.g., Chocolate Cake">
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="input-group">
+              <label>Category</label>
+              <select id="edit-recipe-category">
+                <option value="Breakfast">Breakfast</option>
+                <option value="Lunch">Lunch</option>
+                <option value="Dinner">Dinner</option>
+                <option value="Snack">Snack</option>
+                <option value="Dessert">Dessert</option>
+                <option value="Drink">Drink</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Time (min)</label>
+              <input type="number" id="edit-recipe-time" placeholder="30" min="1">
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Servings</label>
+            <input type="number" id="edit-recipe-servings" placeholder="4" min="1">
+          </div>
+
+          <div class="input-group">
+            <label>Ingredients (one per line)</label>
+            <textarea id="edit-recipe-ingredients" placeholder="2 cups flour&#10;1 egg&#10;3 tbsp butter" style="min-height:100px;font-family:monospace;font-size:0.9rem"></textarea>
+          </div>
+
+          <div class="input-group">
+            <label>Instructions (one per line)</label>
+            <textarea id="edit-recipe-instructions" placeholder="Preheat oven to 350F&#10;Mix dry ingredients&#10;Bake for 25 minutes" style="min-height:100px;font-family:monospace;font-size:0.9rem"></textarea>
+          </div>
         </div>
       </div>
 
@@ -414,11 +422,11 @@
 <div class="modal-overlay" id="share-modal">
   <div class="modal" style="max-width:480px">
     <div class="modal-header">
-      <h2>📤 Share Recipe</h2>
+      <h2 id="share-modal-title">📤 Share Recipe</h2>
       <button class="modal-close" onclick="closeModal('share-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:0.85rem;color:var(--text2);margin-bottom:14px">Copy this formatted recipe to share with anyone.</p>
+      <p style="font-size:0.85rem;color:var(--text2);margin-bottom:14px">Copy this to share with anyone.</p>
       <div class="share-output" id="share-content"></div>
     </div>
     <div class="modal-footer">
