@@ -14,6 +14,15 @@ function showPage(name) {
   
   if (name === 'recipe') renderRecipes();
   if (name === 'gas') { renderSavedCar(); loadSavedCar(); }
+  
+  // Scroll to top when navigating to a new page
+  try {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  } catch (e) {
+    // no-op
+  }
 }
 
 function toggleSidebar() {
