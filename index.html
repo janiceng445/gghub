@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Toolkit</title>
+<title>GG.Tools</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <!-- CSS Files -->
@@ -158,7 +158,7 @@
         <div class="input-group" style="flex:1;margin-bottom:0">
           <label>Car Make</label>
           <select id="car-make" onchange="populateModels()">
-            <option value="">Select Make</option>
+            <option value="">Make</option>
             <option>Acura</option><option>Toyota</option><option>Honda</option><option>Ford</option>
             <option>Chevrolet</option><option>BMW</option><option>Mercedes-Benz</option>
             <option>Volkswagen</option><option>Hyundai</option><option>Kia</option>
@@ -190,7 +190,7 @@
         <div class="input-group">
           <label>Gas Price ($/gal)</label>
           <div class="input-wrap">
-            <input type="text" id="gas-price" placeholder="e.g. 3.45" inputmode="decimal" oninput="calcGas()">
+            <input type="text" id="gas-price" placeholder="e.g. 3.45" inputmode="numeric" oninput="handlePriceInput(this)">
             <button class="input-clear" onclick="clearField('gas-price')">✕</button>
           </div>
         </div>
@@ -467,6 +467,8 @@
 <script>
   renderSavedCar();
   initRecipes();
+  // Initialize gas input helpers
+  if (typeof initGasInputs === 'function') initGasInputs();
 </script>
 
 </body>

@@ -98,6 +98,41 @@ function calcGas() {
   document.getElementById('gas-result').classList.add('visible');
 }
 
+// Format gas price input as monetary value while typing (treat input as cents)
+function handlePriceInput(el) {
+  let raw = el.value.replace(/[^0-9]/g, '');
+  if (raw === '') { el.value = ''; calcGas(); return; }
+  const cents = parseInt(raw, 10);
+  const dollars = (cents / 100).toFixed(2);
+  el.value = dollars;
+  // keep cursor at end
+  setTimeout(() => { el.selectionStart = el.selectionEnd = el.value.length; }, 0);
+  calcGas();
+}
+
+// Mobile/input keyboard helpers: move focus to next field on Enter/Next
+function initGasInputs() {
+  const tank = document.getElementById('tank-level');
+  const price = document.getElementById('gas-price');
+  if (tank) {
+    tank.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (price) price.focus();
+      }
+    });
+  }
+  if (price) {
+    price.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        // when finishing price input, blur to dismiss keyboard
+        price.blur();
+      }
+    });
+  }
+}
+
 function saveCar() {
   const make = document.getElementById('car-make').value;
   const model = document.getElementById('car-model').value;
