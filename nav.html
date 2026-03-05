@@ -1,29 +1,3 @@
-<!-- Top Nav (desktop) -->
-<nav class="top-nav">
-  <a class="logo" href="/">
-    <span class="logo-dot"></span>
-    GG.Tools
-  </a>
-  <a class="nav-btn" href="/tip-calculator.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M12 2v20M2 12h20M7 17h2M7 5h2M15 5h2M15 17h2"/>
-    </svg>
-    Tip Calculator
-  </a>
-  <a class="nav-btn" href="/gas-calculator.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M6 9V2h12v7M6 9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2M9 14h6M9 18h6"/>
-    </svg>
-    Gas Calculator
-  </a>
-  <a class="nav-btn" href="/recipe-book.html">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
-    </svg>
-    Recipe Book
-  </a>
-</nav>
-
 <!-- Hamburger button (mobile only) -->
 <button id="hamburger" class="hamburger" onclick="toggleSidebar()">
   <span></span>
@@ -31,24 +5,29 @@
   <span></span>
 </button>
 
-<!-- Sidebar Overlay -->
+<!-- Sidebar Overlay (mobile only) -->
 <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
 
-<!-- Sidebar (Mobile) -->
+<!-- Sidebar -->
 <div id="sidebar" class="sidebar">
-  <a class="sidebar-btn" href="/tip-calculator.html">
+  <a class="sidebar-logo" href="tip-calculator.html">
+    <span class="logo-dot"></span>
+    GG.Tools
+  </a>
+
+  <a class="sidebar-btn" href="tip-calculator.html">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M12 2v20M2 12h20M7 17h2M7 5h2M15 5h2M15 17h2"/>
     </svg>
     Tip Calculator
   </a>
-  <a class="sidebar-btn" href="/gas-calculator.html">
+  <a class="sidebar-btn" href="gas-calculator.html">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M6 9V2h12v7M6 9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2M9 14h6M9 18h6"/>
     </svg>
     Gas Calculator
   </a>
-  <a class="sidebar-btn" href="/recipe-book.html">
+  <a class="sidebar-btn" href="recipe-book.html">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/>
     </svg>

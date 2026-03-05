@@ -3,13 +3,13 @@
 // ══════════════════════════════════════════════
 
 async function initNav() {
-  const res = await fetch('/nav.html');
+  const res = await fetch('nav.html');
   const html = await res.text();
   document.getElementById('nav-placeholder').innerHTML = html;
 
   // Mark the current page's nav link as active
   const currentFile = window.location.pathname.split('/').pop() || 'index.html';
-  document.querySelectorAll('.nav-btn, .sidebar-btn').forEach(link => {
+  document.querySelectorAll('.sidebar-btn').forEach(link => {
     const linkFile = (link.getAttribute('href') || '').split('/').pop();
     if (linkFile && linkFile === currentFile) link.classList.add('active');
   });

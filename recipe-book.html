@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Recipe Book — GG.Tools</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/variables.css">
-<link rel="stylesheet" href="/css/base.css">
-<link rel="stylesheet" href="/css/navigation.css">
-<link rel="stylesheet" href="/css/forms.css">
-<link rel="stylesheet" href="/css/modal.css">
-<link rel="stylesheet" href="/css/recipe-book.css">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/navigation.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/recipe-book.css">
 </head>
 <body>
 <div id="app">
@@ -32,10 +32,6 @@
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
         New
       </button>
-      <button class="btn btn-secondary btn-sm" onclick="importRecipe()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Import
-      </button>
     </div>
 
     <div class="recipe-grid" id="recipe-grid"></div>
@@ -46,7 +42,8 @@
 
     <!-- ════ RECIPE DETAIL MODAL ════ -->
     <div class="modal-overlay" id="recipe-detail-modal">
-      <div class="modal" style="max-width:720px">
+      <div class="modal" style="max-width:720px;position:relative">
+        <button class="modal-close" onclick="closeModal('recipe-detail-modal')" style="position:absolute;top:12px;right:12px;z-index:10">✕</button>
         <div class="recipe-detail-header" id="detail-hero" style="min-height:180px">
           <div class="recipe-detail-img-placeholder" id="detail-emoji" style="display:none">🍽️</div>
           <img id="detail-hero-img" src="" alt="" style="display:none" class="recipe-detail-img">
@@ -88,12 +85,16 @@
         <div class="modal-tabs">
           <button class="modal-tab active" onclick="switchTab('tab-ingredients','recipe-detail-modal')">Ingredients</button>
           <button class="modal-tab" onclick="switchTab('tab-instructions','recipe-detail-modal')">Instructions</button>
-          <button class="modal-tab" onclick="switchTab('tab-photos','recipe-detail-modal')">Photos</button>
+          <button class="modal-tab" onclick="switchTab('tab-photos','recipe-detail-modal'); renderPhotos()">Photos</button>
         </div>
 
-        <div class="modal-body" style="max-height:50vh;overflow-y:auto">
+        <div class="modal-body" style="height:50vh;overflow-y:auto">
           <div class="tab-pane active" id="tab-ingredients">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px">
+              <button class="btn btn-sm btn-ghost" onclick="copyIngredients()">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Share List
+              </button>
               <button class="btn btn-sm btn-ghost" onclick="clearChecked()">Clear Checks</button>
             </div>
             <div id="ingredients-list"></div>
@@ -116,9 +117,6 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="closeModal('recipe-detail-modal')">Close</button>
-        </div>
       </div>
     </div>
 
@@ -132,6 +130,7 @@
         <div class="modal-tabs">
           <button class="modal-tab" onclick="switchTab('nr-manual','new-recipe-modal')">Manual</button>
           <button class="modal-tab active" onclick="switchTab('nr-ai','new-recipe-modal')">AI Generate</button>
+          <button class="modal-tab" onclick="switchTab('nr-import','new-recipe-modal')">Import</button>
         </div>
         <div class="modal-body" style="max-height:70vh;overflow-y:auto">
 
@@ -169,6 +168,7 @@
               Add Photos
             </button>
             <input type="file" id="new-recipe-photo-input" accept="image/*" multiple style="display:none" onchange="handleNewRecipePhotoUpload(this)">
+            <div class="photo-grid new-recipe-photo-grid" style="margin-top:12px"></div>
           </div>
 
           <!-- AI Generate -->
@@ -195,9 +195,21 @@
                   <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                   Add Photos
                 </button>
-                <input type="file" id="new-recipe-photo-input" accept="image/*" multiple style="display:none" onchange="handleNewRecipePhotoUpload(this)">
+                <div class="photo-grid new-recipe-photo-grid" style="margin-top:12px"></div>
               </div>
             </div>
+          </div>
+
+          <!-- Import -->
+          <div class="tab-pane" id="nr-import">
+            <div style="margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm)">
+              <p style="font-size:0.85rem;color:var(--text2)">Import a recipe from a .json file previously exported from GG.Tools.</p>
+            </div>
+            <button class="btn btn-primary" onclick="importRecipe()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Choose File
+            </button>
+            <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
           </div>
 
         </div>
@@ -251,14 +263,15 @@
         </div>
       </div>
     </div>
-
-    <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
   </div>
 
   <div class="toast" id="toast"></div>
 </div>
 
-<script src="/js/main.js"></script>
-<script src="/js/recipe-book.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/main.js"></script>
+<script src="js/recipe-book.js"></script>
 </body>
 </html>
