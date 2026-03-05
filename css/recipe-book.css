@@ -33,6 +33,9 @@
 #page-container .top-toolbar .search-wrap input { height: 40px; padding: 8px 14px 8px 38px; line-height: 1; }
 #page-container .top-toolbar .btn { height: 40px; padding: 0 16px; }
 
+/* + New button */
+.btn-new { width: 40px; padding: 0 !important; font-size: 1.5rem; line-height: 1; }
+
 /* ── Recipe Grid ── */
 .recipe-grid {
   display: grid;
@@ -280,7 +283,8 @@
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .recipe-grid { grid-template-columns: 1fr 1fr; }
-  #page-container .top-toolbar .search-wrap { width: 100%; flex: none; }
+  #page-container .top-toolbar { flex-wrap: nowrap; }
+  #page-container .top-toolbar .search-wrap { flex: 1; min-width: 0; }
 }
 
 @media (max-width: 380px) {

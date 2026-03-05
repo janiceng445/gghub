@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recipe Book — GG.Tools</title>
+<title>Recipe Book — GG.Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/variables.css">
 <link rel="stylesheet" href="css/base.css">
@@ -28,10 +28,7 @@
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input type="text" placeholder="Search recipes…" id="recipe-search" oninput="renderRecipes()">
       </div>
-      <button class="btn btn-primary btn-sm" onclick="openModal('new-recipe-modal')">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        New
-      </button>
+      <button class="btn btn-primary btn-new" onclick="openModal('new-recipe-modal')">+</button>
     </div>
 
     <div class="recipe-grid" id="recipe-grid"></div>
@@ -203,7 +200,7 @@
           <!-- Import -->
           <div class="tab-pane" id="nr-import">
             <div style="margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm)">
-              <p style="font-size:0.85rem;color:var(--text2)">Import a recipe from a .json file previously exported from GG.Tools.</p>
+              <p style="font-size:0.85rem;color:var(--text2)">Import a recipe from a .json file previously exported from GG.Hub.</p>
             </div>
             <button class="btn btn-primary" onclick="importRecipe()">
               <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
