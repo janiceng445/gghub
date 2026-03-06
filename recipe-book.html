@@ -118,93 +118,97 @@
     <div class="modal-overlay" id="new-recipe-modal">
       <div class="modal">
         <div class="modal-header">
-          <h2>✨ New Recipe</h2>
+          <h2>New Recipe</h2>
           <button class="modal-close" onclick="closeModal('new-recipe-modal')">✕</button>
-        </div>
-        <div class="modal-tabs">
-          <button class="modal-tab" onclick="switchTab('nr-manual','new-recipe-modal')">Manual</button>
-          <button class="modal-tab active" onclick="switchTab('nr-ai','new-recipe-modal')">AI Generate</button>
-          <button class="modal-tab" onclick="switchTab('nr-import','new-recipe-modal')">Import</button>
         </div>
         <div class="modal-body" style="max-height:70vh;overflow-y:auto">
 
-          <!-- Manual -->
-          <div class="tab-pane" id="nr-manual">
-            <div class="input-group">
-              <label>Recipe Name *</label>
-              <input type="text" id="nr-name" placeholder="e.g. Grandma's Lasagna">
-            </div>
-            <div class="input-row">
-              <div class="input-group">
-                <label>Cook Time (min)</label>
-                <input type="number" id="nr-time" placeholder="30" min="1">
-              </div>
-              <div class="input-group">
-                <label>Servings</label>
-                <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
-              </div>
-            </div>
-            <div class="input-group">
-              <label>Emoji (optional)</label>
-              <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
-            </div>
-            <hr class="divider">
-            <div class="input-group">
-              <label>Ingredients — one per line (e.g. "1 cup flour" or "2 eggs")</label>
-              <textarea id="nr-ingredients" placeholder="2 cups flour&#10;3 eggs&#10;1 cup milk&#10;2 tbsp butter"></textarea>
-            </div>
-            <div class="input-group">
-              <label>Instructions — one step per line</label>
-              <textarea id="nr-instructions" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients and stir&#10;Bake for 25-30 minutes"></textarea>
-            </div>
-            <button class="btn btn-sm btn-primary" onclick="triggerPhotoUploadNewRecipe()" style="margin-top:8px">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Add Photos
+          <!-- Assist bar -->
+          <div class="nr-assist-bar">
+            <button class="nr-assist-btn" id="nr-btn-ai" onclick="toggleNrAssist('ai')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              AI Generate
             </button>
-            <input type="file" id="new-recipe-photo-input" accept="image/*" multiple style="display:none" onchange="handleNewRecipePhotoUpload(this)">
-            <div class="photo-grid new-recipe-photo-grid" style="margin-top:12px"></div>
+            <button class="nr-assist-btn" id="nr-btn-scan" onclick="toggleNrAssist('scan')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              Scan Photo
+            </button>
+            <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
           </div>
 
-          <!-- AI Generate -->
-          <div class="tab-pane active" id="nr-ai">
-            <div style="margin-bottom:14px;padding:14px;background:rgba(124,106,247,0.08);border:1px solid rgba(124,106,247,0.2);border-radius:var(--radius-sm)">
-              <p style="font-size:0.85rem;color:var(--text2)">✨ Describe what you want and AI will generate a complete recipe for you.</p>
-            </div>
-            <div class="input-group">
+          <!-- AI panel -->
+          <div id="nr-panel-ai" class="nr-assist-panel" style="display:none">
+            <div class="input-group" style="margin-bottom:10px">
               <label>What would you like to make?</label>
-              <textarea id="ai-prompt" placeholder="e.g. A creamy pasta with spinach and sun-dried tomatoes, vegetarian, serves 4, under 30 minutes" style="min-height:80px"></textarea>
+              <textarea id="ai-prompt" placeholder="e.g. A creamy pasta with spinach and sun-dried tomatoes, vegetarian, serves 4, under 30 minutes" style="min-height:70px"></textarea>
             </div>
-            <button class="btn btn-primary" onclick="generateAIRecipe()" id="ai-generate-btn">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <button class="btn btn-primary btn-sm" onclick="generateAIRecipe()" id="ai-generate-btn">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               Generate Recipe
             </button>
             <div id="ai-loading" style="display:none" class="ai-generating">
               <div class="spinner"></div> AI is crafting your recipe…
             </div>
-            <div id="ai-preview" style="display:none;margin-top:16px">
-              <p style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;font-weight:600">✅ Recipe generated! Review and save:</p>
-              <div id="ai-preview-content" class="share-output" style="max-height:200px"></div>
-              <div style="margin-top:14px">
-                <button class="btn btn-sm btn-primary" onclick="triggerPhotoUploadNewRecipe()">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                  Add Photos
-                </button>
-                <div class="photo-grid new-recipe-photo-grid" style="margin-top:12px"></div>
+          </div>
+
+          <!-- Scan panel -->
+          <div id="nr-panel-scan" class="nr-assist-panel" style="display:none">
+            <div id="scan-upload-area" style="border:2px dashed var(--border);border-radius:var(--radius-sm);padding:24px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById('scan-photo-input').click()">
+              <div id="scan-placeholder">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="opacity:0.4;display:block;margin:0 auto 6px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <p style="color:var(--text2);font-size:0.82rem;margin:0">Tap to upload screenshots</p>
               </div>
+              <div id="scan-thumbnails" style="display:none;flex-wrap:wrap;gap:8px;justify-content:center"></div>
+              <input type="file" id="scan-photo-input" accept="image/*" multiple style="display:none" onchange="handleScanImageSelect(this)">
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <button class="btn btn-primary btn-sm" id="scan-btn" onclick="scanRecipeFromImage()" style="display:none">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Scan Recipe
+              </button>
+              <button class="btn btn-ghost btn-sm" id="scan-clear-btn" onclick="clearScanImages()" style="display:none">Clear</button>
+            </div>
+            <div id="scan-loading" style="display:none" class="ai-generating">
+              <div class="spinner"></div> Scanning your images…
             </div>
           </div>
 
-          <!-- Import -->
-          <div class="tab-pane" id="nr-import">
-            <div style="margin-bottom:20px;padding:14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:var(--radius-sm)">
-              <p style="font-size:0.85rem;color:var(--text2)">Import a recipe from a .json file previously exported from GG.Hub.</p>
-            </div>
-            <button class="btn btn-primary" onclick="importRecipe()">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Choose File
-            </button>
-            <input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(this)">
+          <hr id="nr-assist-divider" class="divider" style="display:none">
+
+          <!-- Form fields (always visible) -->
+          <div class="input-group">
+            <label>Recipe Name *</label>
+            <input type="text" id="nr-name" placeholder="e.g. Grandma's Lasagna">
           </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Cook Time (min)</label>
+              <input type="number" id="nr-time" placeholder="30" min="1">
+            </div>
+            <div class="input-group">
+              <label>Servings</label>
+              <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Emoji (optional)</label>
+            <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
+          </div>
+          <hr class="divider">
+          <div class="input-group">
+            <label>Ingredients — one per line (e.g. "1 cup flour" or "2 eggs")</label>
+            <textarea id="nr-ingredients" placeholder="2 cups flour&#10;3 eggs&#10;1 cup milk&#10;2 tbsp butter"></textarea>
+          </div>
+          <div class="input-group">
+            <label>Instructions — one step per line</label>
+            <textarea id="nr-instructions" placeholder="Preheat oven to 350°F&#10;Mix dry ingredients&#10;Add wet ingredients and stir&#10;Bake for 25-30 minutes"></textarea>
+          </div>
+          <button class="btn btn-sm btn-secondary" onclick="triggerPhotoUploadNewRecipe()" style="margin-top:8px">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Add Photos
+          </button>
+          <input type="file" id="new-recipe-photo-input" accept="image/*" multiple style="display:none" onchange="handleNewRecipePhotoUpload(this)">
+          <div class="photo-grid new-recipe-photo-grid" style="margin-top:12px"></div>
 
         </div>
         <div class="modal-footer">
@@ -309,6 +313,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="js/firebase-config.js"></script>
+<script src="js/api-keys.js"></script>
 <script src="js/main.js"></script>
 <script src="js/recipe-book.js"></script>
 </body>

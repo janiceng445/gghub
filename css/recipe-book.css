@@ -1,5 +1,40 @@
 /* Recipe Book Styles */
 
+/* ── New recipe assist bar ── */
+.nr-assist-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.nr-assist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text2);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nr-assist-btn:hover { background: var(--surface3); color: var(--text); }
+.nr-assist-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(224,32,32,0.07); }
+
+.nr-assist-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 4px;
+}
+
 /* ── Toolbar ── */
 #page-container .top-toolbar {
   display: flex;

@@ -50,6 +50,7 @@ function openModal(id) {
 function closeModal(id) {
   const modal = document.getElementById(id);
   if (modal) modal.classList.remove('open');
+  if (id === 'new-recipe-modal' && typeof resetNewRecipeForm === 'function') resetNewRecipeForm();
 }
 
 function switchTab(tabId, modalId) {

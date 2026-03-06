@@ -12,7 +12,6 @@ let currentRecipe       = null;
 let currentServings     = 4;
 let baseServings        = 4;
 let currentUnit         = 'us';
-let aiGeneratedRecipe   = null;
 let newRecipePhotos     = [];  // {url, date} — Cloudinary URL, staged before save
 let newRecipeCoverIndex = 0;
 
@@ -276,6 +275,10 @@ function renderInstructions() {
   if (resetBtn) resetBtn.style.display = (currentRecipe.doneSteps?.length > 0) ? '' : 'none';
 
   list.innerHTML = '';
+  if (!currentRecipe.instructions?.length) {
+    list.innerHTML = '<p style="color:var(--text2);font-size:0.85rem;font-style:italic;padding:8px 0">No instructions were provided for this recipe.</p>';
+    return;
+  }
   (currentRecipe.instructions || []).forEach((step, i) => {
     const done = currentRecipe.doneSteps?.includes(i);
     const el   = document.createElement('div');
@@ -601,6 +604,38 @@ function handleImport(input) {
 }
 
 // ══════════════════════════════════════════════
+// ASSIST BAR (AI + Scan toggle)
+// ══════════════════════════════════════════════
+
+function toggleNrAssist(type) {
+  const panels   = { ai: 'nr-panel-ai', scan: 'nr-panel-scan' };
+  const btns     = { ai: 'nr-btn-ai',   scan: 'nr-btn-scan'   };
+  const panel    = document.getElementById(panels[type]);
+  const divider  = document.getElementById('nr-assist-divider');
+  if (!panel) return;
+
+  const isOpen = panel.style.display !== 'none';
+  // Close both first
+  Object.values(panels).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  Object.values(btns).forEach(id   => { const el = document.getElementById(id); if (el) el.classList.remove('active'); });
+
+  if (!isOpen) {
+    panel.style.display = 'block';
+    document.getElementById(btns[type])?.classList.add('active');
+  }
+  if (divider) divider.style.display = (!isOpen) ? '' : 'none';
+}
+
+function fillFormFromRecipe(recipe) {
+  document.getElementById('nr-name').value         = recipe.name     || '';
+  document.getElementById('nr-time').value         = recipe.time     || '';
+  document.getElementById('nr-servings').value     = recipe.servings || 4;
+  document.getElementById('nr-emoji').value        = recipe.emoji    || '';
+  document.getElementById('nr-ingredients').value  = (recipe.ingredients  || []).join('\n');
+  document.getElementById('nr-instructions').value = (recipe.instructions || []).join('\n');
+}
+
+// ══════════════════════════════════════════════
 // AI GENERATION
 // ══════════════════════════════════════════════
 
@@ -610,13 +645,10 @@ async function generateAIRecipe() {
 
   const btn     = document.getElementById('ai-generate-btn');
   const loading = document.getElementById('ai-loading');
-  const preview = document.getElementById('ai-preview');
 
   if (btn)     btn.style.display     = 'none';
   if (loading) loading.style.display = 'flex';
-  if (preview) preview.style.display = 'none';
 
-  const GEMINI_KEY = 'AIzaSyCqYho5TEoYYMKgxbqE07ZzsfDFwmxXRqw';
   try {
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
@@ -655,13 +687,9 @@ instructions: clear, concise steps`
     const text   = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     const recipe = JSON.parse(text);
 
-    recipe.checkedIngredients = [];
-    recipe.doneSteps          = [];
-
-    aiGeneratedRecipe = recipe;
-    const content = document.getElementById('ai-preview-content');
-    if (content) content.textContent = formatRecipeText(recipe, recipe.servings);
-    if (preview) preview.style.display = 'block';
+    fillFormFromRecipe(recipe);
+    toggleNrAssist('ai'); // collapse the panel
+    showToast('✅ Recipe filled in — review and save!');
 
   } catch (err) {
     showToast('AI generation failed. Try again.');
@@ -672,10 +700,184 @@ instructions: clear, concise steps`
   }
 }
 
+// ══════════════════════════════════════════════
+// SCAN FROM IMAGE
+// ══════════════════════════════════════════════
+
+let pendingScanFiles = [];
+
+function handleScanImageSelect(input) {
+  const files = Array.from(input.files || []);
+  if (!files.length) return;
+  pendingScanFiles = [...pendingScanFiles, ...files];
+  renderScanThumbnails();
+  const result = document.getElementById('scan-result');
+  if (result) result.style.display = 'none';
+  // Reset input so same file can be re-added after clear
+  input.value = '';
+}
+
+function renderScanThumbnails() {
+  const thumbs      = document.getElementById('scan-thumbnails');
+  const placeholder = document.getElementById('scan-placeholder');
+  const btn         = document.getElementById('scan-btn');
+  const clearBtn    = document.getElementById('scan-clear-btn');
+  if (!thumbs) return;
+
+  if (!pendingScanFiles.length) {
+    thumbs.style.display      = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    if (btn)         btn.style.display          = 'none';
+    if (clearBtn)    clearBtn.style.display      = 'none';
+    return;
+  }
+
+  if (placeholder) placeholder.style.display = 'none';
+  if (btn)         btn.style.display          = 'inline-flex';
+  if (clearBtn)    clearBtn.style.display      = 'inline-flex';
+  thumbs.style.display = 'flex';
+  thumbs.innerHTML = '';
+
+  pendingScanFiles.forEach((file, i) => {
+    const url = URL.createObjectURL(file);
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;display:inline-block';
+
+    const img = document.createElement('img');
+    img.src = url;
+    img.style.cssText = 'width:72px;height:72px;object-fit:cover;border-radius:6px;display:block';
+    img.onload = () => URL.revokeObjectURL(url);
+
+    const del = document.createElement('button');
+    del.textContent = '✕';
+    del.style.cssText = 'position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;line-height:1;cursor:pointer;padding:0';
+    del.onclick = e => { e.stopPropagation(); pendingScanFiles.splice(i, 1); renderScanThumbnails(); };
+
+    wrap.appendChild(img);
+    wrap.appendChild(del);
+    thumbs.appendChild(wrap);
+  });
+
+  // Add more button
+  const addMore = document.createElement('div');
+  addMore.style.cssText = 'width:72px;height:72px;border:2px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:1.4rem';
+  addMore.textContent = '+';
+  addMore.title = 'Add more images';
+  addMore.onclick = e => { e.stopPropagation(); document.getElementById('scan-photo-input').click(); };
+  thumbs.appendChild(addMore);
+}
+
+function clearScanImages() {
+  pendingScanFiles = [];
+  renderScanThumbnails();
+  const result = document.getElementById('scan-result');
+  if (result) result.style.display = 'none';
+}
+
+function compressImageForAI(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = e => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const MAX = 1024;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else       { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const dataURL   = canvas.toDataURL('image/jpeg', 0.85);
+        const base64    = dataURL.split(',')[1];
+        resolve({ base64, mimeType: 'image/jpeg' });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function scanRecipeFromImage() {
+  if (!pendingScanFiles.length) { showToast('Upload an image first'); return; }
+
+  const btn     = document.getElementById('scan-btn');
+  const loading = document.getElementById('scan-loading');
+  const result  = document.getElementById('scan-result');
+
+  if (btn)     btn.style.display     = 'none';
+  if (loading) loading.style.display = 'flex';
+  if (result)  result.style.display  = 'none';
+
+  try {
+    const compressed = await Promise.all(pendingScanFiles.map(compressImageForAI));
+    const imageParts = compressed.map(({ base64, mimeType }) => ({ inline_data: { mime_type: mimeType, data: base64 } }));
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              ...imageParts,
+              { text:
+`This image contains a recipe. Extract it and respond ONLY with a valid JSON object (no markdown, no backticks, no preamble) in this exact format:
+{
+  "name": "Recipe Name",
+  "time": 30,
+  "servings": 4,
+  "emoji": "🍝",
+  "ingredients": ["2 cups flour", "3 eggs", "1 tsp salt"],
+  "instructions": ["Step one description", "Step two description"]
+}
+
+Rules:
+- time: total time in minutes as a number
+- servings: number of servings as a number
+- emoji: a single relevant food emoji
+- ingredients: each as a string like "amount unit ingredient"
+- instructions: clear steps as strings
+- If any field is unclear from the image, make a reasonable estimate` }
+            ]
+          }]
+        })
+      }
+    );
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Gemini scan error:', JSON.stringify(data));
+      throw new Error(data?.error?.message || 'API error');
+    }
+
+    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // Strip markdown code fences if present
+    text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+    const recipe = JSON.parse(text);
+
+    recipe.checkedIngredients = [];
+    recipe.doneSteps          = [];
+
+    fillFormFromRecipe(recipe);
+    toggleNrAssist('scan'); // collapse the panel
+    showToast('✅ Recipe scanned — review and save!');
+
+  } catch (err) {
+    showToast('Scan failed. Try a clearer image.');
+    console.error(err);
+    if (btn) btn.style.display = 'inline-flex';
+  } finally {
+    if (loading) loading.style.display = 'none';
+  }
+}
+
 // ── Save new recipe ──
 async function saveNewRecipe() {
-  if (aiGeneratedRecipe) { saveGeneratedRecipe(); return; }
-
   const name = document.getElementById('nr-name')?.value.trim() || '';
   if (!name) { showToast('Please enter a recipe name'); return; }
 
@@ -685,56 +887,24 @@ async function saveNewRecipe() {
   const recipeId = Date.now().toString();
 
   const recipe = {
-    id:         recipeId,
-    createdAt:  firebase.firestore.FieldValue.serverTimestamp(),
+    id:           recipeId,
+    createdAt:    firebase.firestore.FieldValue.serverTimestamp(),
     name,
-    time:       parseInt(document.getElementById('nr-time')?.value)     || 30,
-    servings:   parseInt(document.getElementById('nr-servings')?.value) || 4,
-    emoji:      document.getElementById('nr-emoji')?.value              || '🍽️',
+    time:         parseInt(document.getElementById('nr-time')?.value)     || 30,
+    servings:     parseInt(document.getElementById('nr-servings')?.value) || 4,
+    emoji:        document.getElementById('nr-emoji')?.value              || '🍽️',
     ingredients:  (document.getElementById('nr-ingredients')?.value  || '').split('\n').map(l => l.trim()).filter(Boolean),
     instructions: (document.getElementById('nr-instructions')?.value || '').split('\n').map(l => l.trim()).filter(Boolean),
-    photos:               [...newRecipePhotos],
-    coverPhotoIndex:      newRecipeCoverIndex,
-    checkedIngredients:   [],
-    doneSteps:            []
-  };
-
-  try {
-    await db.collection('recipes').doc(recipeId).set(recipe);
-    closeModal('new-recipe-modal');
-    resetNewRecipeForm();
-    showToast('🍽️ Recipe saved!');
-  } catch (err) {
-    console.error('Save failed:', err);
-    showToast('Save failed. Try again.');
-  } finally {
-    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save Recipe'; }
-  }
-}
-
-// ── Save AI-generated recipe ──
-async function saveGeneratedRecipe() {
-  if (!aiGeneratedRecipe) return;
-
-  const saveBtn = document.getElementById('save-recipe-btn');
-  if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = 'Saving…'; }
-
-  const recipeId = Date.now().toString();
-
-  const recipe = {
-    ...aiGeneratedRecipe,
-    id:                 recipeId,
-    createdAt:          firebase.firestore.FieldValue.serverTimestamp(),
     photos:             [...newRecipePhotos],
     coverPhotoIndex:    newRecipeCoverIndex,
+    checkedIngredients: [],
+    doneSteps:          []
   };
 
   try {
     await db.collection('recipes').doc(recipeId).set(recipe);
     closeModal('new-recipe-modal');
-    aiGeneratedRecipe = null;
-    resetNewRecipeForm();
-    showToast('🍽️ AI Recipe saved!');
+    showToast('🍽️ Recipe saved!');
   } catch (err) {
     console.error('Save failed:', err);
     showToast('Save failed. Try again.');
@@ -751,14 +921,30 @@ function resetNewRecipeForm() {
   const servingsInput = document.getElementById('nr-servings');
   if (servingsInput) servingsInput.value = '4';
 
-  aiGeneratedRecipe  = null;
-  newRecipePhotos    = [];
+  newRecipePhotos     = [];
   newRecipeCoverIndex = 0;
   renderNewRecipePhotos();
-  const preview = document.getElementById('ai-preview');
-  if (preview) preview.style.display = 'none';
+
+  // Reset AI panel
   const prompt = document.getElementById('ai-prompt');
   if (prompt) prompt.value = '';
+
+  // Reset scan panel
+  pendingScanFiles = [];
+  renderScanThumbnails();
+  const scanInput = document.getElementById('scan-photo-input');
+  if (scanInput) scanInput.value = '';
+
+  // Collapse assist panels
+  ['nr-panel-ai','nr-panel-scan'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  ['nr-btn-ai','nr-btn-scan'].forEach(id => {
+    document.getElementById(id)?.classList.remove('active');
+  });
+  const divider = document.getElementById('nr-assist-divider');
+  if (divider) divider.style.display = 'none';
 }
 
 // ══════════════════════════════════════════════
