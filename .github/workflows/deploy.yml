@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Inject Gemini API key
-        run: echo "const GEMINI_KEY = '${{ secrets.GEMINI_API_KEY }}';" > js/api-keys.js
+        run: echo "const GEMINI_KEY = '${{ secrets.GEMINI_KEY }}';" > js/api-keys.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
