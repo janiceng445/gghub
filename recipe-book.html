@@ -26,9 +26,14 @@
     <div class="top-toolbar">
       <div class="search-wrap">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="text" placeholder="Search recipes…" id="recipe-search" oninput="renderRecipes()">
+        <input type="text" placeholder="Search recipes…" id="recipe-search" oninput="handleSearchInput()">
+        <button class="search-clear" id="search-clear-btn" onclick="clearSearch()" style="display:none">✕</button>
       </div>
       <button class="btn btn-secondary btn-new" onclick="openModal('new-recipe-modal')">+</button>
+    </div>
+    <div class="sort-bar">
+      <button class="sort-btn" id="sort-recent" onclick="setRecipeSort('recent')">Recent</button>
+      <button class="sort-btn" id="sort-alpha" onclick="setRecipeSort('alpha')">A–Z</button>
     </div>
 
     <button class="fab-new" onclick="openModal('new-recipe-modal')" title="New recipe">+</button>
@@ -112,6 +117,18 @@
         </div>
 
       </div>
+    </div>
+
+    <!-- ════ FULLSCREEN PHOTO VIEWER ════ -->
+    <div id="photo-viewer" class="photo-viewer-overlay" style="display:none" onclick="closePhotoViewer()">
+      <button class="photo-viewer-close" onclick="closePhotoViewer()">✕</button>
+      <button class="photo-viewer-nav photo-viewer-prev" onclick="photoViewerNav(-1);event.stopPropagation()">‹</button>
+      <div class="photo-viewer-content" onclick="event.stopPropagation()">
+        <img id="photo-viewer-img" src="" alt="">
+        <div id="photo-viewer-date" class="photo-viewer-date"></div>
+        <button class="photo-viewer-cover-btn" id="photo-viewer-cover-btn" onclick="setViewerCoverPhoto()">☆ Set as Cover</button>
+      </div>
+      <button class="photo-viewer-nav photo-viewer-next" onclick="photoViewerNav(1);event.stopPropagation()">›</button>
     </div>
 
     <!-- ════ NEW RECIPE MODAL ════ -->

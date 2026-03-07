@@ -112,6 +112,23 @@ function autoFillTank() {
   calcGas();
 }
 
+// Auto-decimal: insert decimal 2 places from right once 3+ digits are typed
+function handleGasPriceInput(el) {
+  let raw = el.value.replace(/[^0-9]/g, '').replace(/^0+/, '');
+  if (raw === '') {
+    el.value = '';
+    calcGas();
+    return;
+  }
+  if (raw.length <= 2) {
+    el.value = raw;
+  } else {
+    el.value = raw.slice(0, raw.length - 2) + '.' + raw.slice(-2);
+  }
+  setTimeout(() => { el.selectionStart = el.selectionEnd = el.value.length; }, 0);
+  calcGas();
+}
+
 function handleLevelInput(el) {
   let raw = el.value.replace(/[^0-9.]/g, '');
   if (raw !== '' && parseFloat(raw) > 100) raw = '100';

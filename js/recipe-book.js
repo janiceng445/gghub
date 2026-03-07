@@ -41,6 +41,32 @@ async function uploadToCloudinary(file) {
 // RENDER
 // ══════════════════════════════════════════════
 
+// ── Sort & search ──
+let recipeSort = localStorage.getItem('recipe-sort') || 'recent';
+
+function setRecipeSort(sort) {
+  recipeSort = sort;
+  localStorage.setItem('recipe-sort', sort);
+  document.getElementById('sort-recent')?.classList.toggle('active', sort === 'recent');
+  document.getElementById('sort-alpha')?.classList.toggle('active',  sort === 'alpha');
+  renderRecipes();
+}
+
+function handleSearchInput() {
+  renderRecipes();
+  const val     = document.getElementById('recipe-search')?.value || '';
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) clearBtn.style.display = val ? 'flex' : 'none';
+}
+
+function clearSearch() {
+  const input = document.getElementById('recipe-search');
+  if (input) input.value = '';
+  const clearBtn = document.getElementById('search-clear-btn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  renderRecipes();
+}
+
 function renderRecipes() {
   const search = (document.getElementById('recipe-search')?.value || '').toLowerCase();
   const grid   = document.getElementById('recipe-grid');
@@ -48,9 +74,19 @@ function renderRecipes() {
 
   if (!grid) return;
 
-  const filtered = recipes.filter(r =>
+  // Apply active state to sort buttons
+  document.getElementById('sort-recent')?.classList.toggle('active', recipeSort === 'recent');
+  document.getElementById('sort-alpha')?.classList.toggle('active',  recipeSort === 'alpha');
+
+  let filtered = recipes.filter(r =>
     r.name.toLowerCase().includes(search) || (r.category || '').toLowerCase().includes(search)
   );
+
+  if (recipeSort === 'alpha') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else {
+    filtered.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  }
 
   grid.innerHTML = '';
   if (filtered.length === 0) {
@@ -325,15 +361,79 @@ function renderPhotos() {
     const isCover = i === coverIdx && currentRecipe.photos.length > 0;
     const el = document.createElement('div');
     el.className = 'photo-thumb' + (isCover ? ' cover-photo' : '');
-    el.title = isCover ? 'Cover photo' : 'Set as cover photo';
     el.innerHTML = `
       <img src="${p.url || p.data}" alt="">
       ${p.date ? `<div class="photo-thumb-date">${p.date}</div>` : ''}
       ${isCover ? '<div class="cover-badge">★ Cover</div>' : ''}
     `;
-    el.onclick = () => setCoverPhoto(i);
+    el.onclick = () => openPhotoViewer(i);
     grid.appendChild(el);
   });
+}
+
+// ── Fullscreen photo viewer ──
+let photoViewerIndex = 0;
+
+let _pvTouchStartX = 0;
+function _pvTouchStart(e) { _pvTouchStartX = e.touches[0].clientX; }
+function _pvTouchEnd(e) {
+  const dx = e.changedTouches[0].clientX - _pvTouchStartX;
+  if (Math.abs(dx) > 40) photoViewerNav(dx < 0 ? 1 : -1);
+}
+
+function openPhotoViewer(index) {
+  photoViewerIndex = index;
+  updatePhotoViewer();
+  const el = document.getElementById('photo-viewer');
+  el.style.display = 'flex';
+  el.addEventListener('touchstart', _pvTouchStart, { passive: true });
+  el.addEventListener('touchend', _pvTouchEnd, { passive: true });
+}
+
+function closePhotoViewer() {
+  const el = document.getElementById('photo-viewer');
+  el.style.display = 'none';
+  el.removeEventListener('touchstart', _pvTouchStart);
+  el.removeEventListener('touchend', _pvTouchEnd);
+}
+
+function updatePhotoViewer() {
+  const photos = currentRecipe?.photos || [];
+  if (!photos.length) return;
+  const p        = photos[photoViewerIndex];
+  const isCover  = photoViewerIndex === (currentRecipe.coverPhotoIndex ?? 0);
+  const img      = document.getElementById('photo-viewer-img');
+  const date     = document.getElementById('photo-viewer-date');
+  const coverBtn = document.getElementById('photo-viewer-cover-btn');
+  const prevBtn  = document.querySelector('.photo-viewer-prev');
+  const nextBtn  = document.querySelector('.photo-viewer-next');
+  if (img)      img.src          = p.url || p.data;
+  if (date)     date.textContent = p.date || '';
+  if (coverBtn) {
+    coverBtn.textContent = isCover ? '★ Cover Photo' : '☆ Set as Cover';
+    coverBtn.disabled = isCover;
+    coverBtn.classList.toggle('is-cover', isCover);
+  }
+  if (prevBtn)  prevBtn.style.visibility = photos.length > 1 ? 'visible' : 'hidden';
+  if (nextBtn)  nextBtn.style.visibility = photos.length > 1 ? 'visible' : 'hidden';
+}
+
+function photoViewerNav(dir) {
+  const len = currentRecipe?.photos?.length || 1;
+  photoViewerIndex = (photoViewerIndex + dir + len) % len;
+  updatePhotoViewer();
+}
+
+function setViewerCoverPhoto() {
+  if (!currentRecipe) return;
+  currentRecipe.coverPhotoIndex = photoViewerIndex;
+  saveRecipe(currentRecipe);
+  updatePhotoViewer();
+  renderPhotos();
+  // Update hero image too
+  const photo   = currentRecipe.photos[photoViewerIndex];
+  const heroImg = document.getElementById('detail-hero-img');
+  if (photo && heroImg) { heroImg.src = photo.url || photo.data; heroImg.style.display = 'block'; }
 }
 
 function setCoverPhoto(index) {
@@ -543,9 +643,14 @@ async function deleteCurrentRecipe() {
 
 function shareRecipe() {
   if (!currentRecipe) return;
-  const content = document.getElementById('share-content');
-  if (content) content.textContent = formatRecipeText(currentRecipe, currentServings);
-  openModal('share-modal');
+  const text = formatRecipeText(currentRecipe, currentServings);
+  if (navigator.share) {
+    navigator.share({ title: currentRecipe.name, text }).catch(() => {});
+  } else {
+    const content = document.getElementById('share-content');
+    if (content) content.textContent = text;
+    openModal('share-modal');
+  }
 }
 
 function formatRecipeText(r, servings) {
