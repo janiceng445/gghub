@@ -34,12 +34,9 @@
   border-radius: var(--radius);
   overflow: hidden;
   position: relative;
-  cursor: pointer;
   background-color: var(--surface2);
   background-size: cover;
   background-position: center;
-  padding: 0;
-  transition: border-color 0.15s, transform 0.12s;
 }
 
 .egg-btn-1 { background-image: url('../img/egg-1.jpg'); }
@@ -47,15 +44,6 @@
 .egg-btn-3 { background-image: url('../img/egg-3.jpg'); }
 .egg-btn-4 { background-image: url('../img/egg-4.jpg'); }
 .egg-btn-5 { background-image: url('../img/egg-5.jpg'); }
-
-.egg-btn:hover {
-  border-color: var(--accent);
-  transform: translateY(-3px);
-}
-
-.egg-btn.active {
-  border-color: var(--accent);
-}
 
 /* Dark gradient + text overlay at bottom of button */
 .egg-btn-overlay {
@@ -91,52 +79,3 @@
   color: var(--accent);
 }
 
-.egg-btn.active .egg-btn-time {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* ── Result panel ──────────────────────────────────────── */
-
-.egg-result {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: rgba(224, 32, 32, 0.08);
-  border: 1px solid rgba(224, 32, 32, 0.25);
-  border-radius: var(--radius);
-  padding: 20px 16px;
-  text-align: center;
-  max-width: 480px;
-  margin: 0 auto;
-  animation: pop-in 0.2s ease;
-}
-
-.egg-result.visible {
-  display: flex;
-}
-
-.egg-result-minutes {
-  font-family: 'Outfit', sans-serif;
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.egg-result-label {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text3);
-}
-
-.egg-result-desc {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
-  color: var(--text3);
-}
-
-@keyframes pop-in {
-  from { transform: scale(0.97); opacity: 0; }
-  to   { transform: scale(1);    opacity: 1; }
-}
