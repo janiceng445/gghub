@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Egg — GG.Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/navigation.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/modal.css">
+<link rel="stylesheet" href="css/egg.css">
+</head>
+<body>
+<div id="app">
+  <div id="nav-placeholder"></div>
+
+  <div id="page-container">
+    <div class="page-header">
+      <div class="accent-line"></div>
+      <h1>Egg</h1>
+      <p>Pick how you want your egg — we'll tell you how long to cook it.</p>
+    </div>
+
+    <div class="egg-assumption">
+      Water must be at a <strong>full rolling boil</strong> before eggs are added. Timer starts the moment eggs hit the water.
+    </div>
+
+    <div class="egg-grid">
+
+      <button class="egg-btn egg-btn-1" data-minutes="6" data-label="Soft-Boiled" data-desc="Runny, silky yolk — whites just set" onclick="selectEgg(this)">
+        <div class="egg-btn-overlay">
+          <span class="egg-btn-label">Soft-Boiled</span>
+          <span class="egg-btn-time">6 min</span>
+        </div>
+      </button>
+
+      <button class="egg-btn egg-btn-2" data-minutes="8" data-label="Jammy" data-desc="Jammy, fudgy yolk — perfect for salads or ramen" onclick="selectEgg(this)">
+        <div class="egg-btn-overlay">
+          <span class="egg-btn-label">Jammy</span>
+          <span class="egg-btn-time">8 min</span>
+        </div>
+      </button>
+
+      <button class="egg-btn egg-btn-3" data-minutes="10" data-label="Medium" data-desc="Mostly set yolk with a soft, creamy center" onclick="selectEgg(this)">
+        <div class="egg-btn-overlay">
+          <span class="egg-btn-label">Medium</span>
+          <span class="egg-btn-time">10 min</span>
+        </div>
+      </button>
+
+      <button class="egg-btn egg-btn-4" data-minutes="12" data-label="Hard-Boiled" data-desc="Fully set yolk — slight creaminess remains" onclick="selectEgg(this)">
+        <div class="egg-btn-overlay">
+          <span class="egg-btn-label">Hard-Boiled</span>
+          <span class="egg-btn-time">12 min</span>
+        </div>
+      </button>
+
+      <button class="egg-btn egg-btn-5" data-minutes="14" data-label="Extra Firm" data-desc="Firm, dry yolk — classic deviled egg" onclick="selectEgg(this)">
+        <div class="egg-btn-overlay">
+          <span class="egg-btn-label">Extra Firm</span>
+          <span class="egg-btn-time">14 min</span>
+        </div>
+      </button>
+
+    </div>
+
+    <div class="egg-result" id="egg-result">
+      <div class="egg-result-minutes" id="egg-result-minutes"></div>
+      <div class="egg-result-label" id="egg-result-label"></div>
+      <div class="egg-result-desc" id="egg-result-desc"></div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="js/main.js"></script>
+<script>
+  function selectEgg(btn) {
+    document.querySelectorAll('.egg-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('egg-result-minutes').textContent = btn.dataset.minutes + ' minutes';
+    document.getElementById('egg-result-label').textContent   = btn.dataset.label;
+    document.getElementById('egg-result-desc').textContent    = btn.dataset.desc;
+    document.getElementById('egg-result').classList.add('visible');
+  }
+</script>
+</body>
+</html>
