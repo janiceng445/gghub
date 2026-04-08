@@ -85,7 +85,7 @@ async function getRate(from, to) {
   if (from === to) return 1;
   const key = getCacheKey(from, to);
   if (rateCache[key]) return rateCache[key].rate;
-  const res  = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+  const res  = await fetch(`https://api.frankfurter.dev/v1/latest?from=${from}&to=${to}`);
   const data = await res.json();
   const rate = data.rates[to];
   rateCache[key] = { rate, date: data.date };
