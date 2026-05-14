@@ -183,6 +183,73 @@ function selectIngredient(key) {
   closePicker();
 }
 
+// ── Distance ──
+const DIST_UNITS = [
+  { key: 'mm', label: 'mm', full: 'Millimeter', m: 0.001     },
+  { key: 'cm', label: 'cm', full: 'Centimeter', m: 0.01      },
+  { key: 'm',  label: 'm',  full: 'Meter',      m: 1         },
+  { key: 'km', label: 'km', full: 'Kilometer',  m: 1000      },
+  { key: 'in', label: 'in', full: 'Inch',       m: 0.0254    },
+  { key: 'ft', label: 'ft', full: 'Foot',       m: 0.3048    },
+  { key: 'yd', label: 'yd', full: 'Yard',       m: 0.9144    },
+  { key: 'mi', label: 'mi', full: 'Mile',       m: 1609.344  },
+];
+
+let distFromKey = 'cm';
+let distToKey   = 'in';
+
+function getDistUnit(key) { return DIST_UNITS.find(u => u.key === key); }
+
+function updateDistLabels() {
+  document.getElementById('dist-from-label').textContent = getDistUnit(distFromKey).label;
+  document.getElementById('dist-to-label').textContent   = getDistUnit(distToKey).label;
+}
+
+function updateDistResult() {
+  const rawStr = document.getElementById('dist-input').value;
+  const raw    = parseFloat(rawStr);
+  const result = document.getElementById('dist-result');
+  if (rawStr === '' || isNaN(raw)) { result.textContent = ''; return; }
+  const converted = (raw * getDistUnit(distFromKey).m) / getDistUnit(distToKey).m;
+  result.textContent = formatNum(converted) + ' ' + getDistUnit(distToKey).label;
+}
+
+function swapDistUnits() {
+  [distFromKey, distToKey] = [distToKey, distFromKey];
+  updateDistLabels();
+  updateDistResult();
+}
+
+function openDistPicker(target) {
+  pickerTarget = target;
+  const activeKey = target === 'dist-from' ? distFromKey : distToKey;
+  document.getElementById('picker-title').textContent = target === 'dist-from' ? 'Convert from…' : 'Convert to…';
+  const grid = document.getElementById('picker-grid');
+  grid.innerHTML = '';
+  grid.classList.remove('picker-grid--ingredients');
+  DIST_UNITS.forEach(u => {
+    const btn = document.createElement('button');
+    btn.className = 'picker-unit-btn' + (u.key === activeKey ? ' active' : '');
+    btn.innerHTML = `<span class="pu-label">${u.label}</span><span class="pu-full">${u.full}</span>`;
+    btn.onclick = () => selectDistUnit(u.key);
+    grid.appendChild(btn);
+  });
+  document.getElementById('picker-overlay').classList.add('open');
+}
+
+function selectDistUnit(key) {
+  if (pickerTarget === 'dist-from') {
+    distFromKey = key;
+    if (distFromKey === distToKey) distToKey = DIST_UNITS.find(u => u.key !== key).key;
+  } else {
+    distToKey = key;
+    if (distToKey === distFromKey) distFromKey = DIST_UNITS.find(u => u.key !== key).key;
+  }
+  updateDistLabels();
+  updateDistResult();
+  closePicker();
+}
+
 // ── Temperature ──
 function tempFromF() {
   const val = document.getElementById('temp-f').value;
@@ -200,4 +267,12 @@ function tempFromC() {
   fEl.value = formatNum(c * 9 / 5 + 32);
 }
 
-document.addEventListener('DOMContentLoaded', updateLabels);
+// ── Tab switching ──
+function setConverterTab(tab) {
+  ['temp', 'distance', 'volume'].forEach(t => {
+    document.getElementById('conv-section-' + t).style.display = t === tab ? '' : 'none';
+    document.querySelector(`.conv-tab[data-tab="${t}"]`).classList.toggle('active', t === tab);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => { updateLabels(); updateDistLabels(); });

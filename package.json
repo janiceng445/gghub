@@ -1,0 +1,7 @@
+{
+  "name": "ggtools",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve ."
+  }
+}

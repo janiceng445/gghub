@@ -4,6 +4,39 @@
   display: block;
 }
 
+/* ── Mode tabs ── */
+.converter-tabs {
+  display: flex;
+  width: 100%;
+  max-width: 340px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 3px;
+  gap: 3px;
+}
+
+.conv-tab {
+  flex: 1;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  border-radius: calc(var(--radius) - 3px);
+  color: var(--text2);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.conv-tab:hover { color: var(--text); }
+.conv-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
 .conv-wrap {
   display: flex;
   flex-direction: column;
@@ -11,7 +44,7 @@
   gap: 14px;
   width: 100%;
   max-width: 340px;
-  margin: 40px 0 0;
+  margin: 32px 0 0;
 }
 
 /* ── Temperature cards ── */
@@ -20,7 +53,7 @@
   gap: 12px;
   width: 100%;
   max-width: 340px;
-  margin: 40px 0 0;
+  margin: 32px 0 0;
 }
 
 .temp-card {
@@ -62,6 +95,7 @@
   color: var(--text);
 }
 .temp-input::placeholder { color: var(--text3); }
+
 
 /* ── Unit buttons ── */
 .unit-btn {
@@ -238,8 +272,10 @@
 }
 
 @media (max-width: 640px) {
+  .converter-tabs,
   .conv-wrap,
   .temp-wrap {
-    margin: 40px auto 0;
+    margin-left: auto;
+    margin-right: auto;
   }
 }

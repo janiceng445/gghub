@@ -18,51 +18,68 @@
     <div class="page-header">
       <div class="accent-line" style="background:var(--accent)"></div>
       <h1>Converter</h1>
-      <p>Quick volume & weight conversions for cooking.</p>
+      <p>Temperature, distance, volume & weight conversions.</p>
     </div>
 
-    <!-- Temperature converter -->
-    <div class="temp-wrap">
-      <div class="temp-card">
-        <div class="temp-label">°F</div>
-        <input type="text" id="temp-f" class="temp-input" placeholder="32" inputmode="decimal" oninput="tempFromF()" onclick="this.select()">
+    <!-- Mode tabs -->
+    <div class="converter-tabs">
+      <button class="conv-tab active" data-tab="temp"     onclick="setConverterTab('temp')">Temperature</button>
+      <button class="conv-tab"        data-tab="distance" onclick="setConverterTab('distance')">Distance</button>
+      <button class="conv-tab"        data-tab="volume"   onclick="setConverterTab('volume')">Volume & Weight</button>
+    </div>
+
+    <!-- Temperature -->
+    <div id="conv-section-temp">
+      <div class="temp-wrap">
+        <div class="temp-card">
+          <div class="temp-label">°F</div>
+          <input type="text" id="temp-f" class="temp-input" placeholder="32" inputmode="decimal" oninput="tempFromF()" onclick="this.select()">
+        </div>
+        <div class="temp-card">
+          <div class="temp-label">°C</div>
+          <input type="text" id="temp-c" class="temp-input" placeholder="0" inputmode="decimal" oninput="tempFromC()" onclick="this.select()">
+        </div>
       </div>
-      <div class="temp-card">
-        <div class="temp-label">°C</div>
-        <input type="text" id="temp-c" class="temp-input" placeholder="0" inputmode="decimal" oninput="tempFromC()" onclick="this.select()">
+    </div>
+
+    <!-- Distance -->
+    <div id="conv-section-distance" style="display:none">
+      <div class="conv-wrap">
+        <button class="unit-btn" onclick="openDistPicker('dist-from')">
+          <span id="dist-from-label">cm</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <input type="text" id="dist-input" class="conv-input" placeholder="0" inputmode="decimal" oninput="updateDistResult()" onclick="this.select()">
+        <button class="swap-btn" onclick="swapDistUnits()" title="Swap">⇅</button>
+        <button class="unit-btn" onclick="openDistPicker('dist-to')">
+          <span id="dist-to-label">in</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="conv-result" id="dist-result"></div>
       </div>
     </div>
 
-    <div class="conv-wrap">
-
-      <!-- FROM unit button -->
-      <button class="unit-btn" id="from-btn" onclick="openPicker('from')">
-        <span id="from-label">tbsp</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-
-      <!-- Input -->
-      <input type="text" id="conv-input" class="conv-input" placeholder="0" inputmode="decimal" oninput="updateResult()" onclick="this.select()">
-
-      <!-- Swap button -->
-      <button class="swap-btn" onclick="swapUnits()" title="Swap">⇅</button>
-
-      <!-- TO unit button -->
-      <button class="unit-btn" id="to-btn" onclick="openPicker('to')">
-        <span id="to-label">tsp</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-
-      <!-- Ingredient picker (shown only when mixing volume ↔ weight) -->
-      <button class="ingredient-btn" id="ingredient-btn" onclick="openIngredientPicker()" style="display:none">
-        <span id="ingredient-label">Select ingredient</span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-      </button>
-
-      <!-- Result -->
-      <div class="conv-result" id="conv-result"></div>
-
+    <!-- Volume & Weight -->
+    <div id="conv-section-volume" style="display:none">
+      <div class="conv-wrap">
+        <button class="unit-btn" id="from-btn" onclick="openPicker('from')">
+          <span id="from-label">tbsp</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <input type="text" id="conv-input" class="conv-input" placeholder="0" inputmode="decimal" oninput="updateResult()" onclick="this.select()">
+        <button class="swap-btn" onclick="swapUnits()" title="Swap">⇅</button>
+        <button class="unit-btn" id="to-btn" onclick="openPicker('to')">
+          <span id="to-label">tsp</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <button class="ingredient-btn" id="ingredient-btn" onclick="openIngredientPicker()" style="display:none">
+          <span id="ingredient-label">Select ingredient</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="conv-result" id="conv-result"></div>
+      </div>
     </div>
+
   </div>
 </div>
 

@@ -122,6 +122,7 @@ function renderRecipes() {
       ? `<img src="${coverPhoto.url || coverPhoto.data}" alt="">`
       : (r.emoji || '🍽️');
 
+    const calSpan = r.calories ? `<span>🔥 ${r.calories} cal</span>` : '';
     el.innerHTML = `
       <div class="recipe-card-img">${imgHtml}</div>
       <div class="recipe-card-body">
@@ -129,6 +130,7 @@ function renderRecipes() {
         <div class="recipe-card-meta">
           <span>⏱ ${r.time || '?'} min</span>
           <span>👤 ${r.servings || 4}</span>
+          ${calSpan}
         </div>
       </div>
     `;
@@ -148,6 +150,25 @@ function openRecipe(id) {
   document.getElementById('detail-time').textContent  = '⏱ ' + (currentRecipe.time || '?') + ' min';
   document.getElementById('detail-emoji').textContent = currentRecipe.emoji || '🍽️';
   document.getElementById('detail-emoji').style.display = 'flex';
+
+  const detailCal = document.getElementById('detail-calories');
+  if (detailCal) {
+    if (currentRecipe.calories) {
+      detailCal.textContent = '🔥 ' + currentRecipe.calories + ' cal/serving';
+      detailCal.style.display = '';
+    } else {
+      detailCal.style.display = 'none';
+    }
+  }
+  const detailSource = document.getElementById('detail-source-link');
+  if (detailSource) {
+    if (currentRecipe.sourceUrl) {
+      detailSource.href = currentRecipe.sourceUrl;
+      detailSource.style.display = '';
+    } else {
+      detailSource.style.display = 'none';
+    }
+  }
 
   const heroImg = document.getElementById('detail-hero-img');
   if (currentRecipe.photos && currentRecipe.photos.length > 0) {
@@ -638,6 +659,8 @@ function openEditRecipe() {
   document.getElementById('edit-time').value         = currentRecipe.time || '';
   document.getElementById('edit-servings').value     = currentRecipe.servings || 4;
   document.getElementById('edit-emoji').value        = currentRecipe.emoji || '';
+  document.getElementById('edit-calories').value     = currentRecipe.calories || '';
+  document.getElementById('edit-source-url').value   = currentRecipe.sourceUrl || '';
   document.getElementById('edit-ingredients').value  = (currentRecipe.ingredients  || []).join('\n');
   document.getElementById('edit-instructions').value = (currentRecipe.instructions || []).join('\n');
   openModal('edit-recipe-modal');
@@ -654,6 +677,8 @@ async function saveEditRecipe() {
   currentRecipe.time         = parseInt(document.getElementById('edit-time')?.value)     || currentRecipe.time;
   currentRecipe.servings     = parseInt(document.getElementById('edit-servings')?.value) || currentRecipe.servings;
   currentRecipe.emoji        = document.getElementById('edit-emoji')?.value              || currentRecipe.emoji;
+  currentRecipe.calories     = parseInt(document.getElementById('edit-calories')?.value) || null;
+  currentRecipe.sourceUrl    = document.getElementById('edit-source-url')?.value.trim()  || '';
   currentRecipe.ingredients  = (document.getElementById('edit-ingredients')?.value  || '').split('\n').map(l => l.trim()).filter(Boolean);
   currentRecipe.instructions = (document.getElementById('edit-instructions')?.value || '').split('\n').map(l => l.trim()).filter(Boolean);
 
@@ -779,6 +804,8 @@ function fillFormFromRecipe(recipe) {
   document.getElementById('nr-time').value         = recipe.time     || '';
   document.getElementById('nr-servings').value     = recipe.servings || 4;
   document.getElementById('nr-emoji').value        = recipe.emoji    || '';
+  document.getElementById('nr-calories').value     = recipe.calories || '';
+  document.getElementById('nr-source-url').value   = recipe.sourceUrl || '';
   document.getElementById('nr-ingredients').value  = (recipe.ingredients  || []).join('\n');
   document.getElementById('nr-instructions').value = (recipe.instructions || []).join('\n');
 }
@@ -1047,6 +1074,8 @@ async function saveNewRecipe() {
     time:         parseInt(document.getElementById('nr-time')?.value)     || 30,
     servings:     parseInt(document.getElementById('nr-servings')?.value) || 4,
     emoji:        document.getElementById('nr-emoji')?.value              || '🍽️',
+    calories:     parseInt(document.getElementById('nr-calories')?.value) || null,
+    sourceUrl:    document.getElementById('nr-source-url')?.value.trim()  || '',
     ingredients:  (document.getElementById('nr-ingredients')?.value  || '').split('\n').map(l => l.trim()).filter(Boolean),
     instructions: (document.getElementById('nr-instructions')?.value || '').split('\n').map(l => l.trim()).filter(Boolean),
     photos:             [...newRecipePhotos],
@@ -1068,7 +1097,7 @@ async function saveNewRecipe() {
 }
 
 function resetNewRecipeForm() {
-  ['nr-name','nr-time','nr-emoji','nr-ingredients','nr-instructions'].forEach(id => {
+  ['nr-name','nr-time','nr-emoji','nr-calories','nr-source-url','nr-ingredients','nr-instructions'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });

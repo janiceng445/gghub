@@ -67,10 +67,12 @@
             <div class="recipe-detail-meta">
               <span id="detail-time">⏱ 30 min</span>
               <span id="detail-servings-label">👤 4 servings</span>
+              <span id="detail-calories" style="display:none">🔥 — cal</span>
               <button class="hero-share-btn" onclick="shareRecipe()" title="Share recipe">
                 <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               </button>
             </div>
+            <a id="detail-source-link" href="#" target="_blank" rel="noopener" class="detail-source-link" style="display:none">🔗 Original Recipe</a>
           </div>
         </div>
 
@@ -215,9 +217,19 @@
               <input type="number" id="nr-servings" placeholder="4" min="1" value="4">
             </div>
           </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Emoji (optional)</label>
+              <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
+            </div>
+            <div class="input-group">
+              <label>Calories / Serving (optional)</label>
+              <input type="number" id="nr-calories" placeholder="e.g. 450" min="0">
+            </div>
+          </div>
           <div class="input-group">
-            <label>Emoji (optional)</label>
-            <input type="text" id="nr-emoji" placeholder="🍝" maxlength="2">
+            <label>Original Recipe Link (optional)</label>
+            <input type="text" id="nr-source-url" placeholder="https://...">
           </div>
           <hr class="divider">
           <div class="input-group">
@@ -265,9 +277,19 @@
               <input type="number" id="edit-servings" min="1">
             </div>
           </div>
+          <div class="input-row">
+            <div class="input-group">
+              <label>Emoji (optional)</label>
+              <input type="text" id="edit-emoji" maxlength="2">
+            </div>
+            <div class="input-group">
+              <label>Calories / Serving (optional)</label>
+              <input type="number" id="edit-calories" placeholder="e.g. 450" min="0">
+            </div>
+          </div>
           <div class="input-group">
-            <label>Emoji (optional)</label>
-            <input type="text" id="edit-emoji" maxlength="2">
+            <label>Original Recipe Link (optional)</label>
+            <input type="text" id="edit-source-url" placeholder="https://...">
           </div>
           <hr class="divider">
           <div class="input-group">
