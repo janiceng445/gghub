@@ -1,0 +1,209 @@
+/* Salary Breakdown & Cost Calculator */
+
+/* ── Mode toggle pills ── */
+.toggle-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.toggle-pill {
+  padding: 7px 22px;
+  border-radius: 100px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  color: var(--text2);
+  font-family: 'Inter', sans-serif;
+}
+
+.toggle-pill:hover,
+.toggle-pill.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── Input with $ prefix ── */
+.salary-input-wrap .input-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text2);
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.salary-input-wrap input {
+  padding-left: 26px;
+}
+
+/* ── Breakdown table ── */
+.breakdown-table {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.breakdown-row:last-child {
+  border-bottom: none;
+}
+
+.breakdown-label {
+  font-size: 0.9rem;
+  color: var(--text2);
+}
+
+.breakdown-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* ── Section label (within card) ── */
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin: 20px 0 14px;
+}
+
+/* ── Deductions box ── */
+.takehome-deductions {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px 14px;
+  margin: 14px 0 16px;
+}
+
+.deduction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 0;
+  font-size: 0.86rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.deduction-row:last-child {
+  border-bottom: none;
+}
+
+.deduction-label { color: var(--text2); }
+.deduction-value { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ── Take-home stat grid ── */
+.takehome-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.takehome-stat {
+  text-align: center;
+  background: rgba(74, 222, 128, 0.06);
+  border: 1px solid rgba(74, 222, 128, 0.18);
+  border-radius: var(--radius-sm);
+  padding: 16px 12px;
+}
+
+.takehome-val {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--success);
+}
+
+.takehome-lbl {
+  font-size: 0.68rem;
+  color: var(--text2);
+  margin-top: 5px;
+  letter-spacing: 0.05em;
+}
+
+/* ── Estimate disclaimer ── */
+.estimate-note {
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-top: 14px;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── Cost calculator ── */
+.cost-subtitle {
+  font-size: 0.88rem;
+  color: var(--text2);
+  margin-top: -10px;
+  margin-bottom: 18px;
+}
+
+.cost-time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(224, 32, 32, 0.10), rgba(224, 32, 32, 0.03));
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  padding: 20px 14px;
+}
+
+.cost-time-stat { text-align: center; }
+
+.cost-time-val {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.cost-time-lbl {
+  font-size: 0.68rem;
+  color: var(--text2);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+}
+
+/* ── Worth-it badge ── */
+.worth-it-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 100px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 14px;
+  letter-spacing: 0.01em;
+}
+
+.worth-easy  { background: rgba(74, 222, 128, 0.12); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.25); }
+.worth-small { background: rgba(251, 191, 36, 0.12); color: #fbbf24;        border: 1px solid rgba(251, 191, 36, 0.30); }
+.worth-think { background: var(--accent2-bg);        color: var(--accent2); border: 1px solid var(--accent2-border);    }
+.worth-big   { background: rgba(255, 68, 68, 0.12);  color: var(--danger);  border: 1px solid rgba(255, 68, 68, 0.25); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .takehome-val  { font-size: 1.15rem; }
+  .takehome-grid { gap: 8px; }
+  .cost-time-val { font-size: 1.15rem; }
+  .cost-time-grid { padding: 16px 10px; }
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salary Breakdown — GG.Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/navigation.css">
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/salary.css">
+</head>
+<body>
+<div id="app">
+  <div id="nav-placeholder"></div>
+
+  <div id="page-container">
+    <div class="page-header">
+      <div class="accent-line"></div>
+      <h1>Salary Breakdown</h1>
+      <p>See where your money goes — and what things really cost you.</p>
+    </div>
+
+    <!-- Section 1: Salary Input -->
+    <div class="card">
+      <div class="card-title">Your Salary</div>
+
+      <div class="toggle-pills">
+        <button class="toggle-pill selected" data-mode="hourly" onclick="setMode('hourly')">Hourly</button>
+        <button class="toggle-pill" data-mode="annual" onclick="setMode('annual')">Annual</button>
+      </div>
+
+      <div class="input-group" style="margin-top: 16px; margin-bottom: 0;">
+        <label id="salary-label">Hourly rate</label>
+        <div class="input-wrap salary-input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="text" id="salary-input" placeholder="0.00" oninput="handleSalaryInput(this)" inputmode="decimal">
+          <button class="input-clear" onclick="clearSalary()">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: Salary Breakdown -->
+    <div class="card" id="breakdown-card" style="display:none;">
+      <div class="card-title">Salary Breakdown</div>
+
+      <div class="breakdown-table">
+        <div class="breakdown-row">
+          <span class="breakdown-label">Hourly</span>
+          <span class="breakdown-value" id="val-hourly">—</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Weekly</span>
+          <span class="breakdown-value" id="val-weekly">—</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Monthly</span>
+          <span class="breakdown-value" id="val-monthly">—</span>
+        </div>
+        <div class="breakdown-row">
+          <span class="breakdown-label">Annual</span>
+          <span class="breakdown-value" id="val-annual">—</span>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="section-title">Estimated Take-Home</div>
+
+      <div class="input-group" style="margin-bottom: 0;">
+        <label>Your State</label>
+        <select id="state-select" onchange="handleStateChange()">
+          <option value="">Select state…</option>
+        </select>
+      </div>
+
+      <div id="takehome-section" style="display:none;">
+        <div class="takehome-deductions">
+          <div class="deduction-row">
+            <span class="deduction-label">Federal income tax</span>
+            <span class="deduction-value" id="val-federal-tax">—</span>
+          </div>
+          <div class="deduction-row">
+            <span class="deduction-label">FICA (SS + Medicare)</span>
+            <span class="deduction-value" id="val-fica">—</span>
+          </div>
+          <div class="deduction-row">
+            <span class="deduction-label">State income tax</span>
+            <span class="deduction-value" id="val-state-tax">—</span>
+          </div>
+        </div>
+
+        <div class="takehome-grid">
+          <div class="takehome-stat">
+            <div class="takehome-val" id="val-takehome-monthly">—</div>
+            <div class="takehome-lbl">EST. MONTHLY TAKE-HOME</div>
+          </div>
+          <div class="takehome-stat">
+            <div class="takehome-val" id="val-takehome-annual">—</div>
+            <div class="takehome-lbl">EST. ANNUAL TAKE-HOME</div>
+          </div>
+        </div>
+
+        <p class="estimate-note">Assumes single filer, 2024 federal standard deduction, and a flat state rate. For reference only.</p>
+      </div>
+    </div>
+
+    <!-- Section 3: Cost Calculator -->
+    <div class="card" id="cost-card" style="display:none;">
+      <div class="card-title">Cost Calculator</div>
+      <p class="cost-subtitle">How long did you work for this?</p>
+
+      <div class="input-group" style="margin-bottom: 0;">
+        <label>Purchase amount</label>
+        <div class="input-wrap salary-input-wrap">
+          <span class="input-prefix">$</span>
+          <input type="text" id="cost-input" placeholder="0.00" oninput="handleCostInput(this)" inputmode="decimal">
+          <button class="input-clear" onclick="clearCost()">✕</button>
+        </div>
+      </div>
+
+      <div id="cost-result" style="display:none; margin-top: 16px;">
+        <div class="cost-time-grid">
+          <div class="cost-time-stat">
+            <div class="cost-time-val" id="val-minutes">—</div>
+            <div class="cost-time-lbl">MINUTES</div>
+          </div>
+          <div class="cost-time-stat">
+            <div class="cost-time-val" id="val-hours">—</div>
+            <div class="cost-time-lbl">HOURS</div>
+          </div>
+          <div class="cost-time-stat">
+            <div class="cost-time-val" id="val-days">—</div>
+            <div class="cost-time-lbl">DAYS</div>
+          </div>
+        </div>
+
+        <div class="worth-it-badge" id="worth-it-badge"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="js/main.js"></script>
+<script src="js/salary.js"></script>
+</body>
+</html>
